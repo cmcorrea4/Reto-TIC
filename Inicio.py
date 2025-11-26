@@ -1,0 +1,269 @@
+"""
+Página Principal - Agente datos suelos Agrosavia
+"""
+import streamlit as st
+import pandas as pd
+import numpy as np
+import os
+from sodapy import Socrata
+
+# Importar módulos locales
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils import asignar_tipos_datos, DataCleaner
+
+# Configuración de la página
+st.set_page_config(
+    page_title="Agente datos suelos Agrosavia",
+    page_icon="📊",
+    layout="wide"
+)
+
+# ============================================================================
+# INICIALIZACIÓN DE SESSION STATE
+# ============================================================================
+
+if 'df' not in st.session_state:
+    st.session_state.df = None
+if 'df_original' not in st.session_state:
+    st.session_state.df_original = None
+if 'data_source' not in st.session_state:
+    st.session_state.data_source = None
+if 'cleaning_report' not in st.session_state:
+    st.session_state.cleaning_report = None
+if 'variables_seleccionadas' not in st.session_state:
+    st.session_state.variables_seleccionadas = []
+if 'chat_history' not in st.session_state:
+    st.session_state.chat_history = []
+if 'agent' not in st.session_state:
+    st.session_state.agent = None
+if 'agent_config_key' not in st.session_state:
+    st.session_state.agent_config_key = None
+
+
+def load_data_from_socrata(domain: str, dataset_id: str, limit: int, app_token: str = None) -> tuple:
+    """Carga datos desde Socrata API"""
+    try:
+        client = Socrata(domain, app_token, timeout=30)
+        results = client.get(dataset_id, limit=limit)
+        df = pd.DataFrame.from_records(results)
+        return df, None
+    except Exception as e:
+        return None, str(e)
+
+
+# ============================================================================
+# INTERFAZ PRINCIPAL
+# ============================================================================
+
+st.title("📊 Agente datos suelos Agrosavia")
+st.markdown("**Carga tu archivo CSV/XLS o usa la API Socrata y haz preguntas sobre tus datos usando IA**")
+
+# Sidebar para configuración
+with st.sidebar:
+    st.header("⚙️ Configuración")
+    
+    # Campo para API Key de OpenAI
+    openai_api_key = st.text_input(
+        "🔑 API Key de OpenAI:",
+        type="password",
+        help="Ingresa tu API key de OpenAI para usar el modelo GPT"
+    )
+    
+    # Guardar en session_state
+    st.session_state.openai_api_key = openai_api_key
+    
+    # Selección de modelo
+    model_name = st.selectbox(
+        "🤖 Modelo OpenAI:",
+        ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo-preview"],
+        index=0
+    )
+    st.session_state.model_name = model_name
+    
+    # Temperatura del modelo
+    temperature = st.slider(
+        "🌡️ Temperatura:",
+        min_value=0.0, max_value=1.0, value=0.1, step=0.1,
+        help="Controla la creatividad de las respuestas"
+    )
+    st.session_state.temperature = temperature
+    
+    st.divider()
+    
+    if st.session_state.df is not None:
+        st.subheader("📋 Dataset")
+        st.info(f"📏 {st.session_state.df.shape[0]} filas × {st.session_state.df.shape[1]} columnas")
+        
+        if st.session_state.data_source:
+            st.caption(f"🔗 Fuente: {st.session_state.data_source}")
+        
+        with st.expander("ℹ️ Tipos de datos"):
+            numeric_cols = st.session_state.df.select_dtypes(include=[np.number]).columns
+            text_cols = st.session_state.df.select_dtypes(include=['object']).columns
+            
+            st.write(f"**Numéricas:** {len(numeric_cols)}")
+            st.write(f"**Texto:** {len(text_cols)}")
+            
+            null_total = st.session_state.df.isnull().sum().sum()
+            st.write(f"**Valores nulos:** {null_total}")
+        
+        if st.button("🗑️ Limpiar todo", use_container_width=True):
+            st.session_state.df = None
+            st.session_state.df_original = None
+            st.session_state.agent = None
+            st.session_state.agent_config_key = None
+            st.session_state.data_source = None
+            st.session_state.cleaning_report = None
+            st.session_state.variables_seleccionadas = []
+            st.session_state.chat_history = []
+            st.rerun()
+
+# Verificar API key
+if not openai_api_key:
+    st.warning("⚠️ Por favor, ingresa tu API Key de OpenAI en la barra lateral.")
+    st.info("Puedes obtener tu API key en: https://platform.openai.com/api-keys")
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
+
+# ============================================================================
+# CARGAR DATOS
+# ============================================================================
+
+st.header("📁 Cargar Datos")
+
+subtab1, subtab2 = st.tabs(["📁 Archivo CSV/Excel", "🌐 API Socrata"])
+
+with subtab1:
+    uploaded_file = st.file_uploader(
+        "Selecciona un archivo CSV o Excel:",
+        type=['csv', 'xlsx', 'xls'],
+        help="Formatos soportados: CSV, Excel (.xlsx, .xls)"
+    )
+    
+    if uploaded_file is not None:
+        try:
+            if uploaded_file.name.endswith('.csv'):
+                df_raw = pd.read_csv(uploaded_file, on_bad_lines='skip')
+            else:
+                df_raw = pd.read_excel(uploaded_file)
+            
+            df_raw = asignar_tipos_datos(df_raw)
+            st.session_state.df_original = df_raw.copy()
+            
+            if st.checkbox("🧹 Aplicar limpieza automática", value=False, key="clean_file"):
+                with st.spinner("🧹 Limpiando datos..."):
+                    df_clean, report = DataCleaner.clean_dataframe(df_raw)
+                    st.session_state.df = df_clean
+                    st.session_state.cleaning_report = report
+                    st.session_state.data_source = f"Archivo: {uploaded_file.name}"
+                
+                st.success("✅ Limpieza completada")
+                with st.expander("📋 Ver reporte de limpieza", expanded=True):
+                    for item in report:
+                        st.write(item)
+            else:
+                st.session_state.df = df_raw.copy()
+                st.session_state.data_source = f"Archivo: {uploaded_file.name} (sin limpiar)"
+                st.info("📊 Usando datos originales (sin limpieza)")
+            
+            st.success(f"✅ Archivo cargado exitosamente: {uploaded_file.name}")
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("📏 Filas", st.session_state.df.shape[0])
+            with col2:
+                st.metric("📊 Columnas", st.session_state.df.shape[1])
+            with col3:
+                st.metric("💾 Tamaño", f"{st.session_state.df.memory_usage(deep=True).sum() / 1024:.1f} KB")
+            
+            with st.expander("👀 Vista previa de datos", expanded=False):
+                st.dataframe(st.session_state.df.head(10), use_container_width=True)
+            
+        except Exception as e:
+            st.error(f"❌ Error al cargar el archivo: {str(e)}")
+
+with subtab2:
+    st.markdown("### 🌐 Configuración de Socrata")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        domain = st.text_input("🌍 Dominio:", value="www.datos.gov.co")
+    
+    with col2:
+        dataset_id = st.text_input("🆔 Dataset ID:", value="ch4u-f3i5")
+    
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        limit = st.number_input("📊 Límite de registros:", min_value=100, max_value=50000, value=2000, step=500)
+    
+    with col4:
+        app_token = st.text_input("🔑 App Token (opcional):", type="password")
+    
+    if st.button("🔄 Cargar desde API", use_container_width=True, type="primary"):
+        if domain and dataset_id:
+            with st.spinner("📥 Cargando datos desde API..."):
+                df_raw, error = load_data_from_socrata(domain, dataset_id, limit, app_token if app_token else None)
+                
+                if df_raw is not None:
+                    df_raw = asignar_tipos_datos(df_raw)
+                    st.session_state.df_original = df_raw.copy()
+                    st.session_state.df = df_raw.copy()
+                    st.session_state.data_source = f"API: {domain}/{dataset_id}"
+                    
+                    st.success(f"✅ Datos cargados exitosamente desde API")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("📏 Filas", st.session_state.df.shape[0])
+                    with col2:
+                        st.metric("📊 Columnas", st.session_state.df.shape[1])
+                    with col3:
+                        st.metric("💾 Tamaño", f"{st.session_state.df.memory_usage(deep=True).sum() / 1024:.1f} KB")
+                    
+                    with st.expander("👀 Vista previa de datos", expanded=True):
+                        st.dataframe(st.session_state.df.head(10), use_container_width=True)
+                else:
+                    st.error(f"❌ Error al cargar datos: {error}")
+        else:
+            st.warning("⚠️ Por favor completa los campos requeridos")
+
+# Comparación de datos
+if st.session_state.df is not None and st.session_state.df_original is not None:
+    with st.expander("🔍 Comparar datos originales vs procesados"):
+        col1, col2 = st.columns(2)
+        
+        with col1:
+            st.subheader("📋 Datos Originales")
+            st.write(f"Shape: {st.session_state.df_original.shape}")
+            st.dataframe(st.session_state.df_original.head(5), use_container_width=True)
+        
+        with col2:
+            st.subheader("✨ Datos Procesados")
+            st.write(f"Shape: {st.session_state.df.shape}")
+            st.dataframe(st.session_state.df.head(5), use_container_width=True)
+
+# Información inicial
+if st.session_state.df is None:
+    st.divider()
+    st.info("""
+    ### 🚀 Cómo usar:
+    
+    **Opción 1: Archivo CSV/Excel**
+    1. 📁 Sube un archivo CSV o Excel
+    2. 🧹 Opcional: Aplica limpieza automática
+    
+    **Opción 2: API Socrata**
+    1. 🌍 Ingresa dominio y Dataset ID
+    2. 🔄 Carga desde API
+    
+    **Luego navega a las otras páginas:**
+    - 📊 **Estadísticos**: Consulta estadísticos y calidad de datos
+    - 🤖 **Análisis IA**: Haz preguntas en lenguaje natural
+    """)
+
+# Footer
+st.divider()
+st.caption("📊 Agente datos suelos Agrosavia | Análisis con OpenAI GPT e Índice de Calidad de Datos")
