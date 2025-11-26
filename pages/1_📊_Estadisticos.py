@@ -56,11 +56,11 @@ if vars_no_disponibles:
 
 st.subheader("🔧 Configuración de análisis")
 
-# Inicializar variables seleccionadas
+# Inicializar estado solo si no existe
 if 'variables_seleccionadas' not in st.session_state:
     st.session_state.variables_seleccionadas = []
 
-# Filtrar variables que ya no existen
+# Limpiar variables que ya no existen en el dataset actual
 st.session_state.variables_seleccionadas = [
     v for v in st.session_state.variables_seleccionadas 
     if v in vars_disponibles
@@ -68,16 +68,32 @@ st.session_state.variables_seleccionadas = [
 
 col1, col2 = st.columns([3, 1])
 
+with col2:
+    st.write("")
+    st.write("")
+    # Botones de selección rápida
+    if st.button("✅ Seleccionar Todas", use_container_width=True):
+        st.session_state.variables_seleccionadas = vars_disponibles.copy()
+        st.rerun()
+    
+    if st.button("❌ Deseleccionar", use_container_width=True):
+        st.session_state.variables_seleccionadas = []
+        st.rerun()
+    
+    analizar_btn = st.button("📈 Generar Análisis", type="primary", use_container_width=True)
+
 with col1:
+    # Multiselect SIN key - usamos default y guardamos manualmente
     variables_seleccionadas = st.multiselect(
         "Selecciona variables para analizar:",
         options=vars_disponibles,
         default=st.session_state.variables_seleccionadas,
-        help="Selecciona las variables que deseas incluir en el análisis",
-        key="multiselect_variables"
+        help="Selecciona las variables que deseas incluir en el análisis"
     )
     
-    st.session_state.variables_seleccionadas = variables_seleccionadas
+    # Actualizar session_state solo si cambió por interacción del usuario
+    if variables_seleccionadas != st.session_state.variables_seleccionadas:
+        st.session_state.variables_seleccionadas = variables_seleccionadas
     
     metodo_outliers = st.selectbox(
         "🎯 Método de detección de outliers para ICD:",
@@ -90,19 +106,6 @@ with col1:
         }[x],
         help="Selecciona el método para calcular la dimensión de Precisión en el ICD"
     )
-
-with col2:
-    st.write("")
-    st.write("")
-    if st.button("✅ Seleccionar Todas", use_container_width=True):
-        st.session_state.variables_seleccionadas = vars_disponibles.copy()
-        st.rerun()
-    
-    if st.button("❌ Deseleccionar", use_container_width=True):
-        st.session_state.variables_seleccionadas = []
-        st.rerun()
-    
-    analizar_btn = st.button("📈 Generar Análisis", type="primary", use_container_width=True)
 
 # ============================================================================
 # ANÁLISIS
