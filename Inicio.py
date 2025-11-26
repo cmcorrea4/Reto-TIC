@@ -4,6 +4,7 @@ Página Principal - Agente datos suelos Agrosavia
 import streamlit as st
 import pandas as pd
 import numpy as np
+import os
 from sodapy import Socrata
 
 # Importar módulos locales
