@@ -56,28 +56,26 @@ if vars_no_disponibles:
 
 st.subheader("🔧 Configuración de análisis")
 
-# Inicializar variables seleccionadas
-if 'variables_seleccionadas' not in st.session_state:
-    st.session_state.variables_seleccionadas = []
+# Inicializar el key del multiselect si no existe
+if 'ms_variables' not in st.session_state:
+    st.session_state.ms_variables = []
 
-# Filtrar variables que ya no existen
-st.session_state.variables_seleccionadas = [
-    v for v in st.session_state.variables_seleccionadas 
+# Limpiar variables que ya no existen en el dataset actual
+st.session_state.ms_variables = [
+    v for v in st.session_state.ms_variables 
     if v in vars_disponibles
 ]
 
 col1, col2 = st.columns([3, 1])
 
 with col1:
+    # Multiselect usando key directamente (Streamlit maneja el estado)
     variables_seleccionadas = st.multiselect(
         "Selecciona variables para analizar:",
         options=vars_disponibles,
-        default=st.session_state.variables_seleccionadas,
-        help="Selecciona las variables que deseas incluir en el análisis",
-        key="multiselect_variables"
+        key="ms_variables",
+        help="Selecciona las variables que deseas incluir en el análisis"
     )
-    
-    st.session_state.variables_seleccionadas = variables_seleccionadas
     
     metodo_outliers = st.selectbox(
         "🎯 Método de detección de outliers para ICD:",
@@ -94,13 +92,16 @@ with col1:
 with col2:
     st.write("")
     st.write("")
-    if st.button("✅ Seleccionar Todas", use_container_width=True):
-        st.session_state.variables_seleccionadas = vars_disponibles.copy()
-        st.rerun()
     
-    if st.button("❌ Deseleccionar", use_container_width=True):
-        st.session_state.variables_seleccionadas = []
-        st.rerun()
+    # Usar callback para seleccionar todas
+    def seleccionar_todas():
+        st.session_state.ms_variables = vars_disponibles.copy()
+    
+    def deseleccionar_todas():
+        st.session_state.ms_variables = []
+    
+    st.button("✅ Seleccionar Todas", use_container_width=True, on_click=seleccionar_todas)
+    st.button("❌ Deseleccionar", use_container_width=True, on_click=deseleccionar_todas)
     
     analizar_btn = st.button("📈 Generar Análisis", type="primary", use_container_width=True)
 
