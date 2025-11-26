@@ -306,7 +306,7 @@ def calcular_precision_outliers(df: pd.DataFrame, variables_numericas: List[str]
 
 
 def calcular_variabilidad(df: pd.DataFrame, variables_numericas: List[str] = None) -> Dict:
-    """Calcula la variabilidad controlada (CV razonable)"""
+    """Calcula la variabilidad mediante el Coeficiente de Variación (CV)."""
     df_numeric = preparar_dataframe_numerico(df, variables_numericas)
     
     if df_numeric.empty:
@@ -314,40 +314,57 @@ def calcular_variabilidad(df: pd.DataFrame, variables_numericas: List[str] = Non
             'score': 15, 'cv_promedio': 0, 'cv_por_columna': {},
             'columnas_variabilidad_extrema': {}, 'pct_variabilidad_adecuada': 100
         }
-    
+
     cv_por_columna = {}
     columnas_variabilidad_extrema = {}
     cvs_validos = []
-    
+
     for col in df_numeric.columns:
         data = df_numeric[col].dropna()
-        if len(data) > 0 and data.mean() != 0:
-            cv = (data.std() / data.mean()) * 100
-            cv_por_columna[col] = cv
-            cvs_validos.append(abs(cv))
-            
-            if abs(cv) > 200:
-                columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad excesiva'}
-            elif abs(cv) < 1 and data.nunique() > 1:
-                columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad muy baja'}
-    
+
+        if len(data) <= 1:
+            continue
+
+        mean = data.mean()
+        std = data.std()
+
+        # Manejo seguro cuando la media es muy pequeña
+        if abs(mean) < 1e-9:
+            cv = np.inf
+        else:
+            cv = (std / mean) * 100
+
+        cv_por_columna[col] = cv
+        cvs_validos.append(abs(cv))
+
+        # Detectar variabilidad extrema
+        if cv == 0:
+            columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad nula'}
+        elif abs(cv) < 1 and data.nunique() > 1:
+            columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad extremadamente baja'}
+        elif abs(cv) > 200:
+            columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad excesiva'}
+
     n_columnas = len(cv_por_columna)
     n_extremas = len(columnas_variabilidad_extrema)
-    
+
     if n_columnas > 0:
         pct_adecuadas = ((n_columnas - n_extremas) / n_columnas) * 100
         score = (pct_adecuadas / 100) * 15
     else:
         pct_adecuadas = 100
         score = 15
-    
+
     cv_promedio = np.mean(cvs_validos) if cvs_validos else 0
-    
+
     return {
-        'score': score, 'cv_promedio': cv_promedio, 'cv_por_columna': cv_por_columna,
+        'score': score,
+        'cv_promedio': cv_promedio,
+        'cv_por_columna': cv_por_columna,
         'columnas_variabilidad_extrema': columnas_variabilidad_extrema,
         'pct_variabilidad_adecuada': pct_adecuadas
     }
+
 
 
 def calcular_integridad(df: pd.DataFrame, columnas_esperadas: List[str] = None) -> Dict:
