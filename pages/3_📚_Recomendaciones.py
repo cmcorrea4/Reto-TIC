@@ -42,7 +42,7 @@ def cargar_pdf(ruta_pdf: str) -> str:
         return None
 
 
-def dividir_en_chunks(texto: str, tamano_chunk: int = 500, solapamiento: int = 100) -> list:
+def dividir_en_chunks(texto: str, tamano_chunk: int = 50, solapamiento: int = 10) -> list:
     """Divide el texto en chunks con solapamiento"""
     if not texto:
         return []
