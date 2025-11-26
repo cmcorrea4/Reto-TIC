@@ -7,7 +7,7 @@ import numpy as np
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-
+z
 
 # ================================================================
 # CONFIGURACIÓN
@@ -60,11 +60,12 @@ class RAG_TFIDF:
         self.chunks = chunks
 
         self.vectorizer = TfidfVectorizer(
-            lowercase=True,
-            ngram_range=(1,1),      # Mejor precisión en documentos cortos
-            stop_words="spanish",   # Elimina ruido
-            max_features=2000       # Compacto y eficiente
-        )
+             lowercase=True,
+             ngram_range=(1,1),
+             stop_words=None,   
+             max_features=2000
+         )
+
 
         self.matrix = self.vectorizer.fit_transform(chunks)
         self.vocab = np.array(self.vectorizer.get_feature_names_out())
