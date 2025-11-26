@@ -34,3 +34,4 @@ pydantic==2.8.2
 pydantic-core==2.20.1
 
 tabulate
+pypdf==3.17.0
