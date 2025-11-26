@@ -1,300 +1,183 @@
 """
-Página de Consulta de Recomendaciones (RAG con TF-IDF)
+RAG Optimizado con TF-IDF (Preciso, conciso, sin expanders anidados)
 """
 import streamlit as st
 import os
-import sys
 import numpy as np
+import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import re
 
-st.set_page_config(page_title="Recomendaciones", page_icon="📚", layout="wide")
 
-st.title("📚 Consulta de Recomendaciones")
-st.markdown("**Haz preguntas sobre el documento de recomendaciones usando IA**")
+# ================================================================
+# CONFIGURACIÓN
+# ================================================================
 
-# ============================================================================
-# FUNCIONES PARA RAG CON TF-IDF
-# ============================================================================
+st.set_page_config(page_title="Recomendaciones", page_icon="📘", layout="wide")
+st.title("📘 Consulta Inteligente (RAG Optimizado)")
+st.markdown("Haz preguntas y obtén **conceptos clave + frase relevante** del documento.")
+
+
+# ================================================================
+# UTILIDADES
+# ================================================================
 
 @st.cache_resource
-def cargar_pdf(ruta_pdf: str) -> str:
-    """Carga y extrae texto de un PDF"""
+def cargar_pdf(ruta):
+    """Carga texto desde un PDF con pypdf."""
+    import pypdf
+
     try:
-        import pypdf
-        
-        with open(ruta_pdf, 'rb') as archivo:
-            lector = pypdf.PdfReader(archivo)
-            texto_completo = ""
-            for pagina in lector.pages:
-                texto_completo += pagina.extract_text() + "\n"
-        
-        return texto_completo
-    except ImportError:
-        st.error("❌ Falta la librería pypdf. Instálala con: pip install pypdf")
-        return None
-    except FileNotFoundError:
-        st.error(f"❌ No se encontró el archivo: {ruta_pdf}")
-        return None
+        reader = pypdf.PdfReader(open(ruta, "rb"))
+        texto = "\n".join([p.extract_text() or "" for p in reader.pages])
+        return texto
     except Exception as e:
-        st.error(f"❌ Error al leer el PDF: {str(e)}")
-        return None
+        st.error(f"Error cargando PDF: {e}")
+        return ""
 
 
-def dividir_en_chunks(texto: str, tamano_chunk: int = 50, solapamiento: int = 10) -> list:
-    """Divide el texto en chunks con solapamiento"""
-    if not texto:
-        return []
-    
-    # Limpiar texto
-    texto = re.sub(r'\s+', ' ', texto).strip()
-    
+def dividir_en_chunks(texto, tam=80, sol=20):
+    """Divide en chunks pequeños para mayor precisión."""
+    texto = re.sub(r"\s+", " ", texto)
     palabras = texto.split()
+
     chunks = []
-    
     i = 0
     while i < len(palabras):
-        chunk = ' '.join(palabras[i:i + tamano_chunk])
+        chunk = " ".join(palabras[i:i+tam])
         chunks.append(chunk)
-        i += tamano_chunk - solapamiento
+        i += tam - sol
     
     return chunks
 
 
-class RAGSimple:
-    """Sistema RAG simple usando TF-IDF"""
-    
-    def __init__(self, chunks: list):
+# ================================================================
+# RAG Optimizado
+# ================================================================
+
+class RAG_TFIDF:
+    def __init__(self, chunks):
         self.chunks = chunks
+
         self.vectorizer = TfidfVectorizer(
             lowercase=True,
-            ngram_range=(1, 2),  # Unigramas y bigramas
-            max_df=0.95,
-            min_df=1,
-            stop_words=None  # Mantener stopwords en español
+            ngram_range=(1,1),      # Mejor precisión en documentos cortos
+            stop_words="spanish",   # Elimina ruido
+            max_features=2000       # Compacto y eficiente
         )
-        
-        # Crear matriz TF-IDF de los chunks
-        self.tfidf_matrix = self.vectorizer.fit_transform(chunks)
-    
-    def buscar(self, query: str, top_k: int = 3) -> list:
-        """Busca los chunks más relevantes para una consulta"""
-        # Vectorizar la consulta
-        query_vector = self.vectorizer.transform([query])
-        
-        # Calcular similitud coseno
-        similitudes = cosine_similarity(query_vector, self.tfidf_matrix).flatten()
-        
-        # Obtener los top_k índices más similares
-        indices_top = similitudes.argsort()[-top_k:][::-1]
-        
-        resultados = []
-        for idx in indices_top:
-            if similitudes[idx] > 0:  # Solo incluir si hay alguna similitud
-                resultados.append({
-                    'chunk': self.chunks[idx],
-                    'similitud': similitudes[idx],
-                    'indice': idx
-                })
-        
+
+        self.matrix = self.vectorizer.fit_transform(chunks)
+        self.vocab = np.array(self.vectorizer.get_feature_names_out())
+
+    def _conceptos_clave(self, texto, top=6):
+        """Extrae conceptos clave del chunk."""
+        tfidf_vals = self.vectorizer.transform([texto]).toarray()[0]
+        idx = tfidf_vals.argsort()[::-1][:top]
+        palabras = self.vocab[idx]
+        return ", ".join(palabras)
+
+    def _frase_relevante(self, chunk, conceptos):
+        """Obtiene solo la frase más relevante en lugar de todo el chunk."""
+        frases = re.split(r"[.!?]", chunk)
+        conceptos_lista = [c.strip().lower() for c in conceptos.split(",")]
+
+        for palabra in conceptos_lista:
+            for f in frases:
+                if palabra in f.lower():
+                    return f.strip()
+
+        return chunk[:180]  # fallback mínimo
+
+    def buscar(self, query, k=3):
+        """Recupera chunk relevante."""
+        q_vec = self.vectorizer.transform([query])
+        sims = cosine_similarity(q_vec, self.matrix).flatten()
+
+        idx = sims.argsort()[-k:][::-1]
+        resultados = [(i, sims[i]) for i in idx if sims[i] > 0]
         return resultados
-    
-    def generar_respuesta(self, query: str, top_k: int = 3) -> dict:
-        """Genera una respuesta basada en los chunks relevantes"""
-        resultados = self.buscar(query, top_k)
-        
-        if not resultados:
+
+    def responder(self, query):
+        encontrados = self.buscar(query)
+
+        if not encontrados:
             return {
-                'respuesta': "No encontré información relevante en el documento para tu pregunta.",
-                'contextos': [],
-                'confianza': 0
+                "respuesta": "No encontré información relevante en el documento.",
+                "conceptos": [],
+                "confianza": 0,
+                "chunks": []
             }
-        
-        # Combinar contextos relevantes
-        contextos = [r['chunk'] for r in resultados]
-        confianza_promedio = np.mean([r['similitud'] for r in resultados])
-        
-        # Construir respuesta
-        contexto_combinado = "\n\n".join(contextos)
-        
-        # Respuesta simple: mostrar el contexto más relevante
-        if confianza_promedio > 0.3:
-            respuesta = f"Basándome en el documento, encontré la siguiente información relevante:\n\n{contextos[0]}"
-        elif confianza_promedio > 0.1:
-            respuesta = f"Encontré información que podría estar relacionada con tu pregunta:\n\n{contextos[0]}"
-        else:
-            respuesta = "La información encontrada tiene baja relevancia. Te muestro lo más cercano a tu consulta:\n\n" + contextos[0]
-        
+
+        # Tomar el chunk más relevante
+        idx, sim = encontrados[0]
+        chunk = self.chunks[idx]
+
+        conceptos = self._conceptos_clave(chunk)
+        frase = self._frase_relevante(chunk, conceptos)
+
         return {
-            'respuesta': respuesta,
-            'contextos': resultados,
-            'confianza': confianza_promedio
+            "respuesta": frase,
+            "conceptos": conceptos,
+            "confianza": float(sim),
+            "chunks": encontrados
         }
 
 
-# ============================================================================
-# INICIALIZACIÓN
-# ============================================================================
+# ================================================================
+# CARGAR PDF
+# ================================================================
 
-# Ruta del PDF (en la raíz del proyecto)
-RUTA_PDF = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "recomendaciones.pdf")
+RUTA_PDF = "recomendaciones.pdf"
 
-# Verificar si existe el archivo
 if not os.path.exists(RUTA_PDF):
-    st.warning(f"⚠️ No se encontró el archivo `recomendaciones.pdf` en la raíz del proyecto.")
-    st.info(f"📁 Ruta esperada: `{RUTA_PDF}`")
-    st.markdown("""
-    ### 📋 Instrucciones:
-    1. Coloca un archivo llamado `recomendaciones.pdf` en la carpeta raíz del proyecto
-    2. Recarga la página
-    """)
+    st.error("No se encontró recomendaciones.pdf")
     st.stop()
 
-# Cargar y procesar el PDF
-with st.spinner("📄 Cargando documento..."):
-    texto_pdf = cargar_pdf(RUTA_PDF)
+texto = cargar_pdf(RUTA_PDF)
+chunks = dividir_en_chunks(texto, tam=80, sol=20)
 
-if texto_pdf is None:
-    st.stop()
+rag = RAG_TFIDF(chunks)
 
-# Dividir en chunks
-chunks = dividir_en_chunks(texto_pdf, tamano_chunk=300, solapamiento=50)
+st.success(f"Documento listo: {len(chunks)} secciones indexadas")
 
-if not chunks:
-    st.error("❌ No se pudo extraer texto del PDF")
-    st.stop()
 
-# Crear sistema RAG
-@st.cache_resource
-def crear_rag(_chunks):
-    return RAGSimple(_chunks)
+# ================================================================
+# UI DE CONSULTA
+# ================================================================
 
-rag = crear_rag(chunks)
-
-# ============================================================================
-# INTERFAZ
-# ============================================================================
-
-st.success(f"✅ Documento cargado: {len(chunks)} secciones indexadas")
-
-# Información del documento
-with st.expander("ℹ️ Información del documento"):
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("📄 Caracteres", f"{len(texto_pdf):,}")
-    with col2:
-        st.metric("📚 Secciones", len(chunks))
-    with col3:
-        st.metric("📝 Palabras aprox.", f"{len(texto_pdf.split()):,}")
+if "historial" not in st.session_state:
+    st.session_state.historial = []
 
 st.divider()
+st.subheader("🔍 Haz tu consulta")
 
-# Inicializar historial de chat
-if 'chat_history_rag' not in st.session_state:
-    st.session_state.chat_history_rag = []
+query = st.text_input("Pregunta:")
 
-# Ejemplos de preguntas
-st.subheader("💡 Ejemplos de preguntas:")
-col1, col2 = st.columns(2)
+if st.button("Buscar", type="primary"):
+    if query.strip():
+        resultado = rag.responder(query)
 
-with col1:
-    if st.button("¿Cuáles son las principales recomendaciones?", use_container_width=True):
-        st.session_state.pregunta_ejemplo = "¿Cuáles son las principales recomendaciones?"
-
-with col2:
-    if st.button("¿Qué metodología se utilizó?", use_container_width=True):
-        st.session_state.pregunta_ejemplo = "¿Qué metodología se utilizó?"
-
-st.divider()
-
-# Campo de pregunta
-st.subheader("❓ Haz tu pregunta sobre el documento")
-
-# Usar formulario
-with st.form(key="rag_form", clear_on_submit=True):
-    # Verificar si hay pregunta de ejemplo
-    valor_inicial = st.session_state.get('pregunta_ejemplo', '')
-    if 'pregunta_ejemplo' in st.session_state:
-        del st.session_state.pregunta_ejemplo
-    
-    pregunta = st.text_input(
-        "Escribe tu pregunta:",
-        value=valor_inicial,
-        placeholder="Ej: ¿Qué recomendaciones hay para mejorar la calidad del suelo?"
-    )
-    
-    col1, col2, col3 = st.columns([1, 1, 3])
-    with col1:
-        enviar = st.form_submit_button("🔍 Buscar", type="primary")
-    with col2:
-        pass
-
-# Botón limpiar historial
-if st.button("🗑️ Limpiar historial"):
-    st.session_state.chat_history_rag = []
-    st.rerun()
-
-# Procesar pregunta
-if enviar and pregunta:
-    with st.spinner("🔍 Buscando en el documento..."):
-        resultado = rag.generar_respuesta(pregunta, top_k=3)
-        
-        # Guardar en historial
-        st.session_state.chat_history_rag.append({
-            'pregunta': pregunta,
-            'respuesta': resultado['respuesta'],
-            'confianza': resultado['confianza'],
-            'contextos': resultado['contextos']
+        st.session_state.historial.append({
+            "pregunta": query,
+            "respuesta": resultado["respuesta"],
+            "conceptos": resultado["conceptos"],
+            "confianza": resultado["confianza"],
+            "chunks": resultado["chunks"]
         })
 
-# Mostrar historial
-if st.session_state.chat_history_rag:
+if st.session_state.historial:
     st.divider()
-    st.subheader("💬 Historial de consultas")
-    
-    for i, chat in enumerate(reversed(st.session_state.chat_history_rag)):
-        with st.expander(f"❓ {chat['pregunta'][:60]}..." if len(chat['pregunta']) > 60 else f"❓ {chat['pregunta']}", expanded=(i==0)):
-            
-            # Indicador de confianza
-            confianza = chat['confianza']
-            if confianza > 0.3:
-                st.success(f"🎯 Relevancia: Alta ({confianza:.1%})")
-            elif confianza > 0.1:
-                st.warning(f"🎯 Relevancia: Media ({confianza:.1%})")
-            else:
-                st.error(f"🎯 Relevancia: Baja ({confianza:.1%})")
-            
-            st.markdown("**Respuesta:**")
-            st.write(chat['respuesta'])
-            
-            # Mostrar contextos encontrados
-            if chat['contextos']:
-                with st.expander("📄 Ver secciones del documento utilizadas"):
-                    for j, ctx in enumerate(chat['contextos'], 1):
-                        st.markdown(f"**Sección {j}** (similitud: {ctx['similitud']:.1%})")
-                        st.text(ctx['chunk'][:500] + "..." if len(ctx['chunk']) > 500 else ctx['chunk'])
-                        st.divider()
+    st.subheader("📝 Historial")
 
-# Información adicional
-with st.expander("ℹ️ ¿Cómo funciona este sistema?"):
-    st.markdown("""
-    ### Sistema RAG con TF-IDF
-    
-    Este sistema utiliza **Recuperación Aumentada por Generación (RAG)** simplificado:
-    
-    1. **Indexación**: El documento PDF se divide en secciones pequeñas (chunks)
-    2. **Vectorización**: Cada sección se convierte en un vector usando TF-IDF
-    3. **Búsqueda**: Tu pregunta se compara con todas las secciones usando similitud coseno
-    4. **Respuesta**: Se muestran las secciones más relevantes
-    
-    **Limitaciones:**
-    - No genera texto nuevo, solo recupera secciones existentes
-    - La calidad depende de cómo esté estructurado el PDF
-    - Funciona mejor con preguntas que usen palabras del documento
-    
-    **Tips para mejores resultados:**
-    - Usa palabras clave específicas del documento
-    - Haz preguntas concretas
-    - Si la relevancia es baja, intenta reformular la pregunta
-    """)
+    for h in reversed(st.session_state.historial):
+        with st.expander(f"❓ {h['pregunta']}", expanded=False):
+            st.markdown(f"**🎯 Relevancia:** {h['confianza']:.1%}")
+            st.markdown(f"**🔑 Conceptos clave:** {h['conceptos']}")
+            st.markdown("**💬 Respuesta:**")
+            st.write(h["respuesta"])
+
+            st.markdown("---")
+            st.markdown("**📄 Secciones relevantes:**")
+            for idx, sim in h["chunks"]:
+                st.markdown(f"- Chunk {idx} — similitud {sim:.1%}")
+
