@@ -126,20 +126,20 @@ if st.session_state.agent is not None:
     
     with col1:
         examples1 = [
-            "¿Cuántas filas tiene el dataset?",
+            "Muestra un resumen estadístico de los datos de materia orgánica",
             "¿Cuáles son las columnas numéricas?",
-            "Muestra un resumen estadístico de los datos",
-            "¿Hay valores nulos en el dataset?"
+            "¿Cuantos datos nulos tiene la conductividad eléctrica?",
+            "¿Cual es la media de ph en los cultivos de café?"
         ]
         for example in examples1:
             st.write(f"• {example}")
     
     with col2:
         examples2 = [
-            "¿Cuál es la correlación entre las variables numéricas?",
+            "¿¿Cuál es la correlación mayor entre las variables numéricas?",
             "¿Cuáles son los valores únicos de [columna]?",
             "Calcula la media de [columna_numérica]",
-            "¿Qué cultivos se dan en [municipio]?"
+            "¿Qué cultivos se dan en el muncipio de pasca?"
         ]
         for example in examples2:
             st.write(f"• {example}")
