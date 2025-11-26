@@ -132,6 +132,9 @@ def calcular_precision_outliers(df: pd.DataFrame, variables_numericas: List[str]
     total_datos = 0
     todos_indices_outliers = set()
     
+    # Diccionario para guardar qué índices son outliers en cada columna
+    outliers_por_indice = {}  # {indice: {columna: valor, ...}}
+    
     for col in df_numeric.columns:
         data = df_numeric[col].dropna()
         if len(data) == 0:
@@ -260,6 +263,13 @@ def calcular_precision_outliers(df: pd.DataFrame, variables_numericas: List[str]
         
         todos_indices_outliers.update(indices_metodo)
         
+        # Guardar el valor del outlier para cada índice
+        for idx in indices_metodo:
+            if idx not in outliers_por_indice:
+                outliers_por_indice[idx] = {}
+            # Guardar el valor original del outlier
+            outliers_por_indice[idx][col] = df_numeric.loc[idx, col]
+        
         if n_outliers > 0:
             if 'indices_outliers' not in outlier_info:
                 outlier_info['indices_outliers'] = list(indices_metodo)
@@ -282,17 +292,35 @@ def calcular_precision_outliers(df: pd.DataFrame, variables_numericas: List[str]
         pct_datos_precisos = 100
         score = 20
     
-    # Crear DataFrame con filas de outliers
+    # Crear DataFrame con filas de outliers incluyendo los valores
     if len(todos_indices_outliers) > 0:
         df_outliers_completo = df.loc[list(todos_indices_outliers)].copy()
+        
+        # Crear columnas para mostrar qué variables tienen outliers y sus valores
         variables_outlier = []
+        valores_outlier = []
+        
         for idx in df_outliers_completo.index:
-            vars_con_outlier = []
-            for col, info in outliers_por_columna.items():
-                if idx in info.get('indices_outliers', []):
+            if idx in outliers_por_indice:
+                vars_con_outlier = []
+                vals_con_outlier = []
+                
+                for col, valor in outliers_por_indice[idx].items():
                     vars_con_outlier.append(col)
-            variables_outlier.append(', '.join(vars_con_outlier) if vars_con_outlier else '')
-        df_outliers_completo['variables_con_outlier'] = variables_outlier
+                    # Formatear el valor (redondear si es float)
+                    if isinstance(valor, float):
+                        vals_con_outlier.append(f"{col}: {valor:.4f}")
+                    else:
+                        vals_con_outlier.append(f"{col}: {valor}")
+                
+                variables_outlier.append(', '.join(vars_con_outlier))
+                valores_outlier.append(' | '.join(vals_con_outlier))
+            else:
+                variables_outlier.append('')
+                valores_outlier.append('')
+        
+        df_outliers_completo['🚨 Variables Outlier'] = variables_outlier
+        df_outliers_completo['📊 Valores Outlier'] = valores_outlier
     else:
         df_outliers_completo = pd.DataFrame()
     
