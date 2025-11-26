@@ -4,7 +4,6 @@ Página Principal - Agente datos suelos Agrosavia
 import streamlit as st
 import pandas as pd
 import numpy as np
-import os
 from sodapy import Socrata
 
 # Importar módulos locales
@@ -59,37 +58,9 @@ def load_data_from_socrata(domain: str, dataset_id: str, limit: int, app_token: 
 st.title("📊 Agente datos suelos Agrosavia")
 st.markdown("**Carga tu archivo CSV/XLS o usa la API Socrata y haz preguntas sobre tus datos usando IA**")
 
-# Sidebar para configuración
+# Sidebar para información del dataset
 with st.sidebar:
-    st.header("⚙️ Configuración")
-    
-    # Campo para API Key de OpenAI
-    openai_api_key = st.text_input(
-        "🔑 API Key de OpenAI:",
-        type="password",
-        help="Ingresa tu API key de OpenAI para usar el modelo GPT"
-    )
-    
-    # Guardar en session_state
-    st.session_state.openai_api_key = openai_api_key
-    
-    # Selección de modelo
-    model_name = st.selectbox(
-        "🤖 Modelo OpenAI:",
-        ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo-preview"],
-        index=0
-    )
-    st.session_state.model_name = model_name
-    
-    # Temperatura del modelo
-    temperature = st.slider(
-        "🌡️ Temperatura:",
-        min_value=0.0, max_value=1.0, value=0.1, step=0.1,
-        help="Controla la creatividad de las respuestas"
-    )
-    st.session_state.temperature = temperature
-    
-    st.divider()
+    st.header("📋 Información")
     
     if st.session_state.df is not None:
         st.subheader("📋 Dataset")
@@ -118,13 +89,6 @@ with st.sidebar:
             st.session_state.variables_seleccionadas = []
             st.session_state.chat_history = []
             st.rerun()
-
-# Verificar API key
-if not openai_api_key:
-    st.warning("⚠️ Por favor, ingresa tu API Key de OpenAI en la barra lateral.")
-    st.info("Puedes obtener tu API key en: https://platform.openai.com/api-keys")
-
-os.environ["OPENAI_API_KEY"] = openai_api_key
 
 # ============================================================================
 # CARGAR DATOS
@@ -267,3 +231,4 @@ if st.session_state.df is None:
 # Footer
 st.divider()
 st.caption("📊 Agente datos suelos Agrosavia | Análisis con OpenAI GPT e Índice de Calidad de Datos")
+
