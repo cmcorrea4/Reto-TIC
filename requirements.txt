@@ -51,3 +51,5 @@ Pillow
 pydantic==2.8.2
 pydantic-core==2.20.1
 tabulate
+
+audio-recorder-streamlit==0.0.10
