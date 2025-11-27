@@ -56,8 +56,8 @@ def load_data_from_socrata(domain: str, dataset_id: str, limit: int, app_token: 
 # INTERFAZ PRINCIPAL
 # ============================================================================
 
-st.title("📊 Agente datos suelos Agrosavia")
-st.markdown("**Carga tu archivo CSV/XLS o usa la API Socrata y haz preguntas sobre tus datos usando IA**")
+st.title("📊 Herramienta para cálculo del índice de calidad de datos (ICD) y análisis con asistentes conversacionales")
+st.markdown("**Carga tu archivo CSV/XLS o usa la API Socrata para calcular el índice de calidad de datos (ICD), usa agentes de IA para extraer información**")
 
 # Sidebar para información del dataset
 with st.sidebar:
