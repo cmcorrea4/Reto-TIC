@@ -196,13 +196,13 @@ except Exception as e:
 # INFORMACIÓN DEL DOCUMENTO
 # ============================================================================
 
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("📄 Documento", RUTA_PDF)
-with col2:
-    st.metric("✂️ Fragmentos", len(chunks))
-with col3:
-    st.metric("🤖 Modelo", model_name)
+#col1, col2, col3 = st.columns(3)
+#with col1:
+#    st.metric("📄 Documento", RUTA_PDF)
+#with col2:
+#    st.metric("✂️ Fragmentos", len(chunks))
+#with col3:
+ #   st.metric("🤖 Modelo", model_name)
 
 # ============================================================================
 # INTERFAZ DE CONSULTA
