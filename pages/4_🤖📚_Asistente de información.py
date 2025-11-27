@@ -18,22 +18,31 @@ st.markdown("Haz preguntas y te responderá con base en mi conocimiento.")
 RUTA_PDF = "recomendaciones.pdf"
 
 # ============================================================================
+# CONFIGURACIÓN DE API KEY DESDE SECRETS
+# ============================================================================
+
+# Verificar si existe la API key en secrets
+try:
+    openai_api_key = st.secrets["settings"]["key"]
+    ia_disponible = True
+except:
+    ia_disponible = False
+
+if ia_disponible:
+    os.environ["OPENAI_API_KEY"] = openai_api_key
+
+# ============================================================================
 # CONFIGURACIÓN EN SIDEBAR
 # ============================================================================
 
 with st.sidebar:
     st.header("⚙️ Configuración RAG")
     
-    # Campo para API Key de OpenAI
-    openai_api_key = st.text_input(
-        "🔑 API Key de OpenAI:",
-        type="password",
-        value=st.session_state.get('openai_api_key', ''),
-        help="Ingresa tu API key de OpenAI"
-    )
-    
-    # Guardar en session_state
-    st.session_state.openai_api_key = openai_api_key
+    if ia_disponible:
+        st.success("🔑 Credenciales cargadas correctamente")
+    else:
+        st.error("❌ Error: No se encontraron las credenciales necesarias")
+        st.info("💡 Configura las credenciales en los secrets de la aplicación")
     
     # Selección de modelo
     model_name = st.selectbox(
@@ -52,8 +61,6 @@ with st.sidebar:
         k_results = st.slider("Documentos a recuperar:", 1, 10, 4)
     
     st.divider()
-    st.caption("💡 Obtén tu API key en:")
-    st.caption("https://platform.openai.com/api-keys")
 
     with st.expander("ℹ️ ¿Cómo funciona esta consulta?"):
        st.markdown("""
@@ -72,13 +79,11 @@ if not os.path.exists(RUTA_PDF):
     st.info("Asegúrate de que el archivo PDF esté en la misma carpeta que la aplicación.")
     st.stop()
 
-# Verificar API key
-if not openai_api_key:
-    st.warning("⚠️ Por favor ingresa tu API Key de OpenAI en la barra lateral.")
-    st.info("🔑 Puedes obtener tu API key en: https://platform.openai.com/api-keys")
+# Verificar disponibilidad de IA
+if not ia_disponible:
+    st.error("❌ Asistente no disponible: credenciales no configuradas")
+    st.info("💡 Contacta al administrador para configurar las credenciales del sistema")
     st.stop()
-
-os.environ["OPENAI_API_KEY"] = openai_api_key
 
 
 # ============================================================================
@@ -201,7 +206,7 @@ try:
     st.success(f"Asistente de información configurado ✅ Documento listo: {len(chunks)} secciones indexadas")
 except Exception as e:
     st.error(f"❌ Error creando embeddings: {str(e)}")
-    st.info("Verifica que tu API key sea válida y tenga créditos disponibles.")
+    st.info("Verifica que la API key sea válida y tenga créditos disponibles.")
     st.stop()
 
 # ============================================================================
@@ -284,7 +289,7 @@ if ask_button and user_question.strip():
                 st.code(traceback.format_exc())
 
 # ============================================================================
-# HISTORIAL DE CONSULTAS
+### HISTORIAL DE CONSULTAS
 # ============================================================================
 
 if st.session_state.rag_chat_history:
@@ -300,16 +305,8 @@ if st.session_state.rag_chat_history:
             
             st.markdown("**Respuesta:**")
             st.write(chat['answer'])
-
-
-            #if chat.get('sources'):
-            #    st.markdown("---")
-            #    st.markdown("**📚 Fragmentos relevantes del documento:**")
-            #    for j, source in enumerate(chat['sources'][:3], 1):
-            #        st.caption(f"*{j}. {source}*")
-
 # ============================================================================
-# INFORMACIÓN ADICIONAL
+### INFORMACIÓN ADICIONAL
 # ============================================================================
 
 
