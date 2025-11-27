@@ -22,7 +22,8 @@ if 'df' not in st.session_state or st.session_state.df is None:
 
 # Obtener API Key desde st.secrets
 try:
-    openai_api_key = st.secrets["OPENAI_API_KEY"]
+    #openai_api_key = st.secrets["OPENAI_API_KEY"]
+    openai_api_keyapi_key = st.secrets["settings"]["key"]
 except KeyError:
     st.error("❌ No se encontró la API Key de OpenAI en los secrets.")
     st.info("""
