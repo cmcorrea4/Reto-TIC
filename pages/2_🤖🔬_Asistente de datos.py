@@ -20,25 +20,14 @@ if 'df' not in st.session_state or st.session_state.df is None:
 # CONFIGURACIÓN DE API KEY DESDE SECRETS
 # ============================================================================
 
-# Obtener API Key desde st.secrets
+# Verificar si existe la API key en secrets
 try:
-    #openai_api_key = st.secrets["OPENAI_API_KEY"]
-    openai_api_keyapi_key = st.secrets["settings"]["key"]
-except KeyError:
-    st.error("❌ No se encontró la API Key de OpenAI en los secrets.")
-    st.info("""
-    **Para configurar la API Key:**
-    
-    **Desarrollo local:** Crea un archivo `.streamlit/secrets.toml` con:
-    ```toml
-    OPENAI_API_KEY = "tu-api-key-aqui"
-    ```
-    
-    **Streamlit Cloud:** Configura el secret en Settings → Secrets
-    """)
-    st.stop()
+    openai_api_key = st.secrets["settings"]["OPENAI_API_KEY"]
+    ia_disponible = True
+except:
+    ia_disponible = False
 
-os.environ["OPENAI_API_KEY"] = openai_api_key
+os.environ["OPENAI_API_KEY"] = openai_api_key if ia_disponible else ""
 
 # ============================================================================
 # SIDEBAR
@@ -47,13 +36,16 @@ os.environ["OPENAI_API_KEY"] = openai_api_key
 with st.sidebar:
     st.header("⚙️ Configuración IA")
     
-    # Indicador de API Key configurada
-    st.success("🔑 API Key configurada ✓")
+    if ia_disponible:
+        st.success("🔑 Credenciales cargadas correctamente")
+    else:
+        st.error("❌ Error: No se encontraron las credenciales necesarias")
+        st.info("💡 Configura las credenciales en los secrets de la aplicación")
     
     # Selección de modelo
     model_name = st.selectbox(
         "🤖 Modelo OpenAI:",
-        ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo-preview", "gpt-4o", "gpt-4o-mini"],
+        ["gpt-4o-mini", "gpt-4o", "gpt-3.5-turbo", "gpt-4", "gpt-4-turbo"],
         index=0
     )
     st.session_state.model_name = model_name
@@ -78,6 +70,11 @@ with st.sidebar:
         - Para análisis muy complejos, considera dividir la pregunta en pasos más pequeños.
         """)
 
+# Verificar disponibilidad de IA
+if not ia_disponible:
+    st.error("❌ Análisis inteligente no disponible: credenciales no configuradas")
+    st.info("💡 Contacta al administrador para configurar las credenciales del sistema")
+    st.stop()
 
 # Temperatura fija (no visible para el usuario)
 temperature = 0.1
