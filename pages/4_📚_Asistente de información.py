@@ -216,13 +216,37 @@ st.divider()
 st.subheader("🔍 Haz tu consulta")
 
 # Ejemplos de preguntas
-with st.expander("💡 Ejemplos de preguntas"):
-    st.markdown("""
-    - ¿Cuáles son las principales recomendaciones del documento?
-    - ¿Qué se menciona sobre [tema específico]?
-    - Resume los puntos más importantes
-    - ¿Cuáles son las conclusiones?
-    """)
+col1, col2 = st.columns(2)
+    
+with col1:
+    examples1 = [
+            "Muestra un resumen estadístico de los datos de materia orgánica",
+            "¿Cuáles son las columnas numéricas?",
+            "¿Cuantos datos nulos tiene la conductividad eléctrica?",
+            "¿Cual es la media de ph en los cultivos de café?"
+        ]
+        for example in examples1:
+            st.write(f"• {example}")
+    
+with col2:
+    examples2 = [
+            "¿¿Cuál es la correlación mayor entre las variables numéricas?",
+            "¿Cuáles son los valores únicos de [columna]?",
+            "Calcula la media de [columna_numérica]",
+            "¿Qué cultivos se dan en el muncipio de pasca?"
+        ]
+        for example in examples2:
+            st.write(f"• {example}")
+    
+st.divider()
+
+#with st.expander("💡 Ejemplos de preguntas"):
+#    st.markdown("""
+#    - ¿Cuáles son las principales recomendaciones del documento?
+#    - ¿Qué se menciona sobre [tema específico]?
+#    - Resume los puntos más importantes
+#    - ¿Cuáles son las conclusiones?
+#    """)
 
 # Formulario de pregunta
 with st.form(key="rag_question_form", clear_on_submit=True):
