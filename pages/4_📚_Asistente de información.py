@@ -220,20 +220,20 @@ col1, col2 = st.columns(2)
     
 with col1:
     examples1 = [
-            "Muestra un resumen estadístico de los datos de materia orgánica",
-            "¿Cuáles son las columnas numéricas?",
-            "¿Cuantos datos nulos tiene la conductividad eléctrica?",
-            "¿Cual es la media de ph en los cultivos de café?"
+            "Que significa un alto valor de Aluminio?",
+            "¿Que hacer si tengo un ph de agua Bajo?",
+            "¿En que unidades se mide la materia órganica ?",
+            "¿Qué significa la métrica de Completitud dentro del Índice de Calidad de Datos y qué recomendación se dá cuando está baja?"
     ]
     for example in examples1:
         st.write(f"• {example}")
     
 with col2:
     examples2 = [
-            "¿¿Cuál es la correlación mayor entre las variables numéricas?",
-            "¿Cuáles son los valores únicos de [columna]?",
-            "Calcula la media de [columna_numérica]",
-            "¿Qué cultivos se dan en el muncipio de pasca?"
+            "¿Qué indica un Coeficiente de Variación (CV) cercano a 0 o mayor a 200% ?",
+            "¿Cuáles son los síntomas y la acción recomendada cuando el fósforo Bray II está muy bajo?",
+            "Qué diferencia hay entre asimetría positiva y asimetría negativa según la explicación del documento",
+            "¿Cómo se interpreta un valor muy alto de acidez KCl o aluminio intercambiable en el suelo y qué acción recomienda aplica?"
     ]
     for example in examples2:
         st.write(f"• {example}")
