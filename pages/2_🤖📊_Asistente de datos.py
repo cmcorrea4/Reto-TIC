@@ -47,6 +47,26 @@ with st.sidebar:
     st.caption("💡 Puedes obtener tu API key en:")
     st.caption("https://platform.openai.com/api-keys")
 
+    # Información adicional
+    with st.expander("ℹ️ Consejos para mejores resultados"):
+        st.markdown("""
+        **Consejos para hacer preguntas efectivas:**
+        
+        1. **Sé específico**: En lugar de "muéstrame estadísticas", pregunta "¿Cuál es la media y desviación estándar de ph_agua_suelo?"
+        
+        2. **Usa nombres exactos de columnas**: Verifica los nombres de las columnas en la vista previa de datos.
+        
+        3. **Preguntas complejas**: El agente puede hacer análisis complejos como correlaciones, agrupaciones y filtros.
+        
+        4. **Iteración**: Puedes hacer preguntas de seguimiento basándote en respuestas anteriores.
+        
+        **Limitaciones:**
+        - El agente trabaja con los datos en memoria, no puede guardar cambios permanentes.
+        - Para análisis muy complejos, considera dividir la pregunta en pasos más pequeños.
+        """)
+
+
+
 # Verificar API key
 if not openai_api_key:
     st.warning("⚠️ Por favor ingresa tu API Key de OpenAI en la barra lateral.")
@@ -199,23 +219,7 @@ if st.session_state.agent is not None:
                 st.write(chat['answer'])
                 st.divider()
     
-    # Información adicional
-    with st.expander("ℹ️ Consejos para mejores resultados"):
-        st.markdown("""
-        **Consejos para hacer preguntas efectivas:**
-        
-        1. **Sé específico**: En lugar de "muéstrame estadísticas", pregunta "¿Cuál es la media y desviación estándar de ph_agua_suelo?"
-        
-        2. **Usa nombres exactos de columnas**: Verifica los nombres de las columnas en la vista previa de datos.
-        
-        3. **Preguntas complejas**: El agente puede hacer análisis complejos como correlaciones, agrupaciones y filtros.
-        
-        4. **Iteración**: Puedes hacer preguntas de seguimiento basándote en respuestas anteriores.
-        
-        **Limitaciones:**
-        - El agente trabaja con los datos en memoria, no puede guardar cambios permanentes.
-        - Para análisis muy complejos, considera dividir la pregunta en pasos más pequeños.
-        """)
+    
 
 else:
     st.error("❌ No se pudo inicializar el agente. Verifica tu API key.")
