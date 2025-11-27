@@ -22,12 +22,13 @@ if 'df' not in st.session_state or st.session_state.df is None:
 
 # Verificar si existe la API key en secrets
 try:
-    openai_api_key = st.secrets["settings"]["OPENAI_API_KEY"]
+    openai_api_key = st.secrets["settings"]["key"]
     ia_disponible = True
 except:
     ia_disponible = False
 
-os.environ["OPENAI_API_KEY"] = openai_api_key if ia_disponible else ""
+if ia_disponible:
+    os.environ["OPENAI_API_KEY"] = openai_api_key
 
 # ============================================================================
 # SIDEBAR
