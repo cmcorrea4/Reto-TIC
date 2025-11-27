@@ -81,10 +81,6 @@ if not openai_api_key:
 os.environ["OPENAI_API_KEY"] = openai_api_key
 
 
-
-
-
-
 # ============================================================================
 # IMPORTAR DEPENDENCIAS
 # ============================================================================
@@ -209,18 +205,6 @@ except Exception as e:
     st.stop()
 
 # ============================================================================
-# INFORMACIÓN DEL DOCUMENTO
-# ============================================================================
-
-#col1, col2, col3 = st.columns(3)
-#with col1:
-#    st.metric("📄 Documento", RUTA_PDF)
-#with col2:
-#    st.metric("✂️ Fragmentos", len(chunks))
-#with col3:
- #   st.metric("🤖 Modelo", model_name)
-
-# ============================================================================
 # INTERFAZ DE CONSULTA
 # ============================================================================
 
@@ -256,13 +240,9 @@ with col2:
     
 st.divider()
 
-#with st.expander("💡 Ejemplos de preguntas"):
-#    st.markdown("""
-#    - ¿Cuáles son las principales recomendaciones del documento?
-#    - ¿Qué se menciona sobre [tema específico]?
-#    - Resume los puntos más importantes
-#    - ¿Cuáles son las conclusiones?
-#    """)
+# Función callback para limpiar historial (evita el loop)
+def limpiar_historial_rag():
+    st.session_state.rag_chat_history = []
 
 # Formulario de pregunta
 st.subheader("🔍 Haz tu consulta")
@@ -277,10 +257,8 @@ with st.form(key="rag_question_form", clear_on_submit=True):
     with col1:
         ask_button = st.form_submit_button("🚀 Preguntar", type="primary")
 
-# Botón limpiar historial
-if st.button("🗑️ Limpiar historial"):
-    st.session_state.rag_chat_history = []
-    st.rerun()
+# Botón limpiar historial usando callback (sin rerun manual)
+st.button("🗑️ Limpiar historial", on_click=limpiar_historial_rag)
 
 # Procesar pregunta
 if ask_button and user_question.strip():
@@ -324,7 +302,8 @@ if st.session_state.rag_chat_history:
             
             st.markdown("**Respuesta:**")
             st.write(chat['answer'])
-            
+
+
             #if chat.get('sources'):
             #    st.markdown("---")
             #    st.markdown("**📚 Fragmentos relevantes del documento:**")
