@@ -8,7 +8,7 @@ import os
 
 st.set_page_config(page_title="RAG PDF", page_icon="📄", layout="wide")
 
-st.title("📄 Consulta Inteligente con RAG")
+st.title("📄 Asistente de información")
 st.markdown("Haz preguntas sobre el documento de recomendaciones usando IA generativa.")
 
 # ============================================================================
