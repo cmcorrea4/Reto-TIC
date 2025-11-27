@@ -110,15 +110,15 @@ if st.session_state.agent is not None:
     st.success("🎯 Agente IA inicializado correctamente")
     
     # Información del dataset
-    col1, col2, col3 = st.columns(3)
-    with col1:
-        st.metric("📏 Filas", st.session_state.df.shape[0])
-    with col2:
-        st.metric("📊 Columnas", st.session_state.df.shape[1])
-    with col3:
-        st.metric("🤖 Modelo", model_name)
+    #col1, col2, col3 = st.columns(3)
+    #with col1:
+    #    st.metric("📏 Filas", st.session_state.df.shape[0])
+    #with col2:
+    #    st.metric("📊 Columnas", st.session_state.df.shape[1])
+    #with col3:
+    #    st.metric("🤖 Modelo", model_name)
     
-    st.divider()
+   # st.divider()
     
     # Ejemplos de preguntas
     st.subheader("💡 Ejemplos de preguntas que puedes hacer:")
