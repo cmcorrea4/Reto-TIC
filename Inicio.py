@@ -225,11 +225,12 @@ if st.session_state.df is None:
     2. 🔄 Carga desde API
     
     **Luego navega a las otras páginas:**
-    - 📊 **Estadísticos**: Consulta estadísticos y calidad de datos
-    - 🤖 **Análisis IA**: Haz preguntas en lenguaje natural
+    - 📊 **Análisis e IDC**: Consulta estadísticos y calidad de datos
+    - 🤖 **Asistente de datos**: Haz preguntas en lenguaje natural para analizar y operar con tus datos
+    - 🤖 **Asistente de Información**: Haz preguntas en lenguaje natural para tener una guía de acción y conocimiento
     """)
 
 # Footer
 st.divider()
-st.caption("📊 Agente datos suelos Agrosavia | Análisis con OpenAI GPT e Índice de Calidad de Datos")
+st.caption("📊 Agente datos suelos Agrosavia Powered by SUME | Índice de Calidad de Datos y asistencia con IA")
 
