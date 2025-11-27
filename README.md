@@ -65,7 +65,7 @@ sueloguia/
 - **Limpieza automática**: Eliminación de filas/columnas vacías, duplicados y conversión de tipos
 - **Normalización**: Estandarización de nombres de columnas (tildes, espacios, mayúsculas)
 
-### 2. Índice de Calidad de Datos - ICD (`calidad_datos.py`)
+### 2. Índice de Calidad de Datos - ICD (`📊_Análisis e IDC.py`)
 
 El ICD evalúa la calidad de los datos en **6 dimensiones** con un puntaje total de 0-100:
 
