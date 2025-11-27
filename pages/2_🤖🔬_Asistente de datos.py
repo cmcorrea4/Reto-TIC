@@ -17,7 +17,7 @@ if 'df' not in st.session_state or st.session_state.df is None:
     st.stop()
 
 # ============================================================================
-# CONFIGURACIÓN EN SIDEBAR
+##SIDEBAR
 # ============================================================================
 
 with st.sidebar:
@@ -136,7 +136,6 @@ if st.session_state.agent is not None:
     with col1:
         examples1 = [
             "Muestra un resumen estadístico de los datos de materia orgánica",
-            "¿Cuáles son las columnas numéricas?",
             "¿Cuantos datos nulos tiene la conductividad eléctrica?",
             "¿Cual es la media de ph en los cultivos de café?"
         ]
@@ -147,7 +146,6 @@ if st.session_state.agent is not None:
         examples2 = [
             "¿Cuál es la correlación mayor entre las variables numéricas?",
             "¿Cuáles son los valores únicos de [columna]?",
-            "Calcula la media de [columna_numérica]",
             "¿Qué cultivos se dan en el muncipio de pasca?"
         ]
         for example in examples2:
@@ -156,9 +154,9 @@ if st.session_state.agent is not None:
     st.divider()
     
     # Interface para hacer preguntas
-    #st.subheader("❓ Haz tu pregunta sobre los datos")
+   
     
-    # Función callback para limpiar historial (evita el loop)
+    
     def limpiar_historial():
         st.session_state.chat_history = []
     
