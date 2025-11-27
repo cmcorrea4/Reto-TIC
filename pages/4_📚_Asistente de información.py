@@ -60,13 +60,9 @@ with st.sidebar:
           Esta página usa **RAG (Retrieval-Augmented Generation)**:
     
           1. **Indexación**: El documento se divide en fragmentos y se crean embeddings vectoriales
-          2. **Búsqueda**: Tu pregunta se convierte en un vector y se buscan los fragmentos más similares
+          2. **Búsqueda**: Tu pregunta se convierte en un vector y se buscan los fragmentos (vectores) más similares
           3. **Generación**: GPT genera una respuesta basada en los fragmentos encontrados
     
-          **Diferencia con la página de Recomendaciones (TF-IDF):**
-          - Esta página usa **embeddings semánticos** (OpenAI) - entiende el significado
-          - La otra usa **TF-IDF** - busca coincidencias de palabras clave
-          - Esta genera respuestas con **GPT**, la otra extrae frases del documento
           """)
 
 
