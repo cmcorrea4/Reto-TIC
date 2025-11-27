@@ -55,6 +55,21 @@ with st.sidebar:
     st.caption("💡 Obtén tu API key en:")
     st.caption("https://platform.openai.com/api-keys")
 
+    with st.expander("ℹ️ ¿Cómo funciona esta consulta?"):
+       st.markdown("""
+          Esta página usa **RAG (Retrieval-Augmented Generation)**:
+    
+          1. **Indexación**: El documento se divide en fragmentos y se crean embeddings vectoriales
+          2. **Búsqueda**: Tu pregunta se convierte en un vector y se buscan los fragmentos más similares
+          3. **Generación**: GPT genera una respuesta basada en los fragmentos encontrados
+    
+          **Diferencia con la página de Recomendaciones (TF-IDF):**
+          - Esta página usa **embeddings semánticos** (OpenAI) - entiende el significado
+          - La otra usa **TF-IDF** - busca coincidencias de palabras clave
+          - Esta genera respuestas con **GPT**, la otra extrae frases del documento
+          """)
+
+
 # Verificar que existe el PDF
 if not os.path.exists(RUTA_PDF):
     st.error(f"❌ No se encontró el archivo `{RUTA_PDF}` en la raíz del proyecto.")
@@ -68,6 +83,11 @@ if not openai_api_key:
     st.stop()
 
 os.environ["OPENAI_API_KEY"] = openai_api_key
+
+
+
+
+
 
 # ============================================================================
 # IMPORTAR DEPENDENCIAS
@@ -319,16 +339,4 @@ if st.session_state.rag_chat_history:
 # INFORMACIÓN ADICIONAL
 # ============================================================================
 
-with st.expander("ℹ️ ¿Cómo funciona esta consulta?"):
-    st.markdown("""
-    Esta página usa **RAG (Retrieval-Augmented Generation)**:
-    
-    1. **Indexación**: El documento se divide en fragmentos y se crean embeddings vectoriales
-    2. **Búsqueda**: Tu pregunta se convierte en un vector y se buscan los fragmentos más similares
-    3. **Generación**: GPT genera una respuesta basada en los fragmentos encontrados
-    
-    **Diferencia con la página de Recomendaciones (TF-IDF):**
-    - Esta página usa **embeddings semánticos** (OpenAI) - entiende el significado
-    - La otra usa **TF-IDF** - busca coincidencias de palabras clave
-    - Esta genera respuestas con **GPT**, la otra extrae frases del documento
-    """)
+
