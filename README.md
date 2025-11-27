@@ -35,7 +35,7 @@ sueloguia/
 ├── pages/
 │   ├── 2_📊_Análisis e IDC.py  # Análisis estadístico y cálculo de ICD
 │   ├── 3_🤖🔬_Asistente de datos.py   # Agente conversacional con Pandas
-│   └── 4_🤖📚_Asistente de información.py.py       # Asistente RAG con documento de recomendaciones
+│   └── 4_🤖📚_Asistente de información.py       # Asistente RAG con documento de recomendaciones
 │
 ├── requirements.txt          # Dependencias del proyecto
 └── README.md                 # Este archivo
@@ -45,7 +45,7 @@ sueloguia/
 
 ## 🎯 Funcionalidades
 
-### 1. Carga de Datos (`app.py`)
+### 1. Carga de Datos (`Inicio.py`)
 
 - **Archivos locales**: Soporte para CSV y Excel (.xlsx, .xls)
 - **API Socrata**: Conexión directa a datos.gov.co y otros portales de datos abiertos
@@ -88,7 +88,7 @@ Tres métodos disponibles para la dimensión de Precisión:
 - Matriz de correlación con heatmap
 - Tabla de estadísticos descriptivos completa
 
-### 5. Agente IA para Consultas (`pages/2_🤖_Analisis_IA.py`)
+### 5. Agente IA para Consultas (`pages/🤖🔬_Asistente de datos.py`)
 
 Utiliza LangChain + OpenAI GPT para responder preguntas en lenguaje natural:
 
@@ -100,7 +100,7 @@ Ejemplos de consultas:
 - "¿Qué cultivos se dan en el municipio de Pasca?"
 ```
 
-### 6. RAG con Recomendaciones (`pages/3_📄_RAG_PDF.py`)
+### 6. RAG con Recomendaciones (`pages/🤖📚_Asistente de información.py `)
 
 Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`:
 
