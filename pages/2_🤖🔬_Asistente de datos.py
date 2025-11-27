@@ -17,35 +17,47 @@ if 'df' not in st.session_state or st.session_state.df is None:
     st.stop()
 
 # ============================================================================
-##SIDEBAR
+# CONFIGURACIÓN DE API KEY DESDE SECRETS
+# ============================================================================
+
+# Obtener API Key desde st.secrets
+try:
+    openai_api_key = st.secrets["OPENAI_API_KEY"]
+except KeyError:
+    st.error("❌ No se encontró la API Key de OpenAI en los secrets.")
+    st.info("""
+    **Para configurar la API Key:**
+    
+    **Desarrollo local:** Crea un archivo `.streamlit/secrets.toml` con:
+    ```toml
+    OPENAI_API_KEY = "tu-api-key-aqui"
+    ```
+    
+    **Streamlit Cloud:** Configura el secret en Settings → Secrets
+    """)
+    st.stop()
+
+os.environ["OPENAI_API_KEY"] = openai_api_key
+
+# ============================================================================
+# SIDEBAR
 # ============================================================================
 
 with st.sidebar:
     st.header("⚙️ Configuración IA")
     
-    # Campo para API Key de OpenAI
-    openai_api_key = st.text_input(
-        "🔑 API Key de OpenAI:",
-        type="password",
-        value=st.session_state.get('openai_api_key', ''),
-        help="Ingresa tu API key de OpenAI para usar el modelo GPT"
-    )
-    
-    # Guardar en session_state
-    st.session_state.openai_api_key = openai_api_key
+    # Indicador de API Key configurada
+    st.success("🔑 API Key configurada ✓")
     
     # Selección de modelo
     model_name = st.selectbox(
         "🤖 Modelo OpenAI:",
-        ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo-preview"],
+        ["gpt-3.5-turbo", "gpt-4", "gpt-4-turbo-preview", "gpt-4o", "gpt-4o-mini"],
         index=0
     )
     st.session_state.model_name = model_name
     
     st.divider()
-    
-    st.caption("💡 Puedes obtener tu API key en:")
-    st.caption("https://platform.openai.com/api-keys")
 
     # Información adicional
     with st.expander("ℹ️ Consejos para mejores resultados"):
@@ -66,18 +78,10 @@ with st.sidebar:
         """)
 
 
-# Verificar API key
-if not openai_api_key:
-    st.warning("⚠️ Por favor ingresa tu API Key de OpenAI en la barra lateral.")
-    st.info("🔑 Puedes obtener tu API key en: https://platform.openai.com/api-keys")
-    st.stop()
-
-os.environ["OPENAI_API_KEY"] = openai_api_key
-
 # Temperatura fija (no visible para el usuario)
 temperature = 0.1
 
-# Importar LangChain (después de verificar API key)
+# Importar LangChain
 try:
     from langchain.agents.agent_types import AgentType
     from langchain_experimental.agents.agent_toolkits import create_pandas_dataframe_agent
@@ -121,7 +125,7 @@ if st.session_state.get('agent') is None or st.session_state.agent_config_key !=
             st.session_state.agent_config_key = agent_config_key
     except Exception as e:
         st.error(f"❌ Error al inicializar el agente: {str(e)}")
-        st.info("Verifica que tu API key de OpenAI sea válida y tenga créditos disponibles.")
+        st.info("Verifica que la API key de OpenAI sea válida y tenga créditos disponibles.")
         st.session_state.agent = None
         st.stop()
 
@@ -153,10 +157,7 @@ if st.session_state.agent is not None:
     
     st.divider()
     
-    # Interface para hacer preguntas
-   
-    
-    
+    # Función para limpiar historial
     def limpiar_historial():
         st.session_state.chat_history = []
     
@@ -208,4 +209,4 @@ if st.session_state.agent is not None:
                 st.divider()
 
 else:
-    st.error("❌ No se pudo inicializar el agente. Verifica tu API key.")
+    st.error("❌ No se pudo inicializar el agente. Verifica la configuración.")
