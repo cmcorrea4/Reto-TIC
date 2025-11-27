@@ -3,6 +3,7 @@ Utilidades compartidas para la aplicación Agrosavia
 """
 import pandas as pd
 import numpy as np
+import unicodedata
 from typing import Dict, List
 from sklearn.cluster import KMeans
 from sklearn.svm import OneClassSVM
@@ -48,12 +49,44 @@ COLUMNAS_NUMERICAS = [
 ]
 
 
+def normalizar_nombres_columnas(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normaliza los nombres de columnas para que coincidan con VARIABLES_ESTADISTICAS.
+    Convierte a minúsculas, reemplaza espacios por guiones bajos, elimina tildes.
+    
+    Ejemplos de conversión:
+        'Ph Agua Suelo' -> 'ph_agua_suelo'
+        'Materia Orgánica' -> 'materia_organica'
+        'FOSFORO_BRAY_II' -> 'fosforo_bray_ii'
+    """
+    def normalizar(texto):
+        # Convertir a minúsculas
+        texto = str(texto).lower().strip()
+        # Eliminar tildes/acentos
+        texto = unicodedata.normalize('NFD', texto)
+        texto = ''.join(c for c in texto if unicodedata.category(c) != 'Mn')
+        # Reemplazar espacios y guiones por guiones bajos
+        texto = texto.replace(' ', '_').replace('-', '_')
+        # Eliminar caracteres especiales (solo letras, números y guion bajo)
+        texto = ''.join(c if c.isalnum() or c == '_' else '_' for c in texto)
+        # Eliminar guiones bajos múltiples
+        while '__' in texto:
+            texto = texto.replace('__', '_')
+        return texto.strip('_')
+    
+    df_copy = df.copy()
+    df_copy.columns = [normalizar(col) for col in df_copy.columns]
+    return df_copy
+
+
 def asignar_tipos_datos(df: pd.DataFrame) -> pd.DataFrame:
     """
     Asigna correctamente los tipos de datos a las columnas del DataFrame.
+    Primero normaliza nombres de columnas, luego convierte tipos.
     Columnas numéricas específicas se convierten a float, el resto a string.
     """
-    df_typed = df.copy()
+    # Primero normalizar nombres de columnas
+    df_typed = normalizar_nombres_columnas(df)
     
     # Convertir columnas numéricas
     for col in COLUMNAS_NUMERICAS:
