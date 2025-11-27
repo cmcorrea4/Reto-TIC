@@ -26,16 +26,16 @@ SueloGuIA es una aplicación web desarrollada con Streamlit que permite:
 ```
 sueloguia/
 │
-├── app.py                    # Página principal - Carga de datos
+├── Inicio.py                    # Página principal - Carga de datos
 ├── utils.py                  # Utilidades: limpieza, normalización, tipos
 ├── calidad_datos.py          # Cálculo del Índice de Calidad de Datos (ICD)
 ├── visualizaciones.py        # Estadísticos descriptivos y gráficos
 ├── recomendaciones.pdf       # Documento base para RAG (recomendaciones agronómicas)
 │
 ├── pages/
-│   ├── 1_📊_Estadisticos.py  # Análisis estadístico y cálculo de ICD
-│   ├── 2_🤖_Analisis_IA.py   # Agente conversacional con Pandas
-│   └── 3_📄_RAG_PDF.py       # Asistente RAG con documento de recomendaciones
+│   ├── 2_📊_Análisis e IDC.py  # Análisis estadístico y cálculo de ICD
+│   ├── 3_🤖🔬_Asistente de datos.py   # Agente conversacional con Pandas
+│   └── 4_🤖📚_Asistente de información.py.py       # Asistente RAG con documento de recomendaciones
 │
 ├── requirements.txt          # Dependencias del proyecto
 └── README.md                 # Este archivo
