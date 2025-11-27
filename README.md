@@ -96,7 +96,7 @@ Utiliza LangChain + OpenAI GPT para responder preguntas en lenguaje natural:
 Ejemplos de consultas:
 - "¿Cuál es la media de pH en los cultivos de café?"
 - "Muestra un resumen estadístico de materia orgánica"
-- "¿Cuántos datos nulos tiene la conductividad eléctrica?"
+- "¿Cuál es la correlación mayor entre las variables numéricas?"
 - "¿Qué cultivos se dan en el municipio de Pasca?"
 ```
 
