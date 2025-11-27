@@ -13,9 +13,7 @@ Herramienta integral para el análisis de calidad de datos de suelos agrícolas,
 
 La aplicación está desplegada en **Streamlit Cloud**:
 
-🔗 **[Acceder a SueloGuIA](https://tu-app.streamlit.app)**
-
-> *Reemplaza el enlace con la URL de tu aplicación desplegada*
+🔗 **[Acceder a SueloGuIA](https://agrosaviaidc.streamlit.app/)**
 
 ---
 
