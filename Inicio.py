@@ -231,5 +231,5 @@ if st.session_state.df is None:
 
 # Footer
 st.divider()
-st.caption("📊 Agente datos suelos Agrosavia | Análisis con OpenAI GPT e Índice de Calidad de Datos")
+st.caption("📊 Agente datos suelos Agrosavia Powered by SUME | Índice de Calidad de Datos y asistencia IA")
 
