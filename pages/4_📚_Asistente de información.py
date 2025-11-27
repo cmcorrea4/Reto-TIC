@@ -186,7 +186,7 @@ chunks = create_chunks(text, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 try:
     chunk_config = f"{chunk_size}_{chunk_overlap}"
     vector_store = create_vector_store(tuple(chunks), openai_api_key, chunk_config)
-    st.success(f"✅ Documento listo: {len(chunks)} secciones indexadas")
+    st.success(f"Asistente de información configurado ✅ Documento listo: {len(chunks)} secciones indexadas")
 except Exception as e:
     st.error(f"❌ Error creando embeddings: {str(e)}")
     st.info("Verifica que tu API key sea válida y tenga créditos disponibles.")
