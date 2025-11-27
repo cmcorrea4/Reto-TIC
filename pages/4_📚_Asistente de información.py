@@ -213,9 +213,9 @@ if 'rag_chat_history' not in st.session_state:
     st.session_state.rag_chat_history = []
 
 st.divider()
-st.subheader("🔍 Haz tu consulta")
 
 # Ejemplos de preguntas
+st.subheader("💡 Ejemplos de preguntas que puedes hacer:")
 col1, col2 = st.columns(2)
     
 with col1:
@@ -249,6 +249,7 @@ st.divider()
 #    """)
 
 # Formulario de pregunta
+st.subheader("🔍 Haz tu consulta")
 with st.form(key="rag_question_form", clear_on_submit=True):
     user_question = st.text_area(
         "Escribe tu pregunta sobre el documento:",
