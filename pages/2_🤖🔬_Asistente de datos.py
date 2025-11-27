@@ -156,15 +156,15 @@ if st.session_state.agent is not None:
     st.divider()
     
     # Interface para hacer preguntas
-    st.subheader("❓ Haz tu pregunta sobre los datos")
+    #st.subheader("❓ Haz tu pregunta sobre los datos")
     
     # Función callback para limpiar historial (evita el loop)
     def limpiar_historial():
         st.session_state.chat_history = []
     
-    # Usar un formulario para evitar rerun automático
+    st.subheader("🔍 Haz tu consulta")
     with st.form(key="question_form", clear_on_submit=True):
-        user_question = st.text_input(
+        user_question = st.text_area(
             "Escribe tu pregunta:",
             placeholder="Ej: ¿Cuál es la correlación entre las variables numéricas?",
             key="user_input_form"
