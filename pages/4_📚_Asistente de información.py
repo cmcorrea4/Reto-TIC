@@ -232,7 +232,7 @@ with col2:
     examples2 = [
             "¿Qué indica un Coeficiente de Variación (CV) cercano a 0 o mayor a 200% ?",
             "¿Cuáles son los síntomas y la acción recomendada cuando el fósforo Bray II está muy bajo?",
-            "Qué diferencia hay entre asimetría positiva y asimetría negativa según la explicación del documento",
+            "Qué diferencia hay entre asimetría positiva y asimetría negativa?",
             "¿Cómo se interpreta un valor muy alto de acidez KCl o aluminio intercambiable en el suelo y qué acción recomienda aplica?"
     ]
     for example in examples2:
@@ -309,11 +309,11 @@ if st.session_state.rag_chat_history:
             st.markdown("**Respuesta:**")
             st.write(chat['answer'])
             
-            if chat.get('sources'):
-                st.markdown("---")
-                st.markdown("**📚 Fragmentos relevantes del documento:**")
-                for j, source in enumerate(chat['sources'][:3], 1):
-                    st.caption(f"*{j}. {source}*")
+            #if chat.get('sources'):
+            #    st.markdown("---")
+            #    st.markdown("**📚 Fragmentos relevantes del documento:**")
+            #    for j, source in enumerate(chat['sources'][:3], 1):
+            #        st.caption(f"*{j}. {source}*")
 
 # ============================================================================
 # INFORMACIÓN ADICIONAL
