@@ -190,7 +190,7 @@ Desde la página principal, puedes:
 
 ### 2. Analizar calidad de datos
 
-En la página **📊 Estadísticos**:
+En la página **📊_Análisis e IDC.py**:
 
 1. Selecciona las variables a analizar
 2. Elige el método de detección de outliers
@@ -199,7 +199,7 @@ En la página **📊 Estadísticos**:
 
 ### 3. Consultas con IA
 
-En la página **🤖 Análisis IA**:
+En la página **🤖🔬_Asistente de datos.py**:
 
 1. Ingresa tu API Key de OpenAI en la barra lateral
 2. Escribe tu pregunta en lenguaje natural
@@ -207,7 +207,7 @@ En la página **🤖 Análisis IA**:
 
 ### 4. Consultas sobre recomendaciones
 
-En la página **📄 RAG PDF**:
+En la página **🤖📚_Asistente de información**:
 
 1. Ingresa tu API Key de OpenAI
 2. Haz preguntas sobre interpretación de resultados o recomendaciones agronómicas
