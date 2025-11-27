@@ -7,9 +7,9 @@ import warnings
 warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="Análisis IA", page_icon="🤖", layout="wide")
-
+ 
 st.title("🤖 Asistente de datos IA")
-st.markdown("Hazme preguntas sobre los datos cargados, soy experto en python.")
+st.markdown("Hazme preguntas sobre los datos cargados, soy experto en python (pandas).")
 
 # Verificar que hay datos cargados
 if 'df' not in st.session_state or st.session_state.df is None:
