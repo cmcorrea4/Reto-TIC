@@ -8,7 +8,7 @@ warnings.filterwarnings('ignore')
 
 st.set_page_config(page_title="Análisis IA", page_icon="🤖", layout="wide")
 
-st.title("🤖 Agente de Análisis IA")
+st.title("🤖 Asistente de datos IA")
 
 # Verificar que hay datos cargados
 if 'df' not in st.session_state or st.session_state.df is None:
