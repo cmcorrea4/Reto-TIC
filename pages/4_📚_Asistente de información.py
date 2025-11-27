@@ -226,7 +226,7 @@ with col1:
             "¿Cual es la media de ph en los cultivos de café?"
         ]
         for example in examples1:
-            st.write(f"• {example}")
+           st.write(f"• {example}")
     
 with col2:
     examples2 = [
@@ -234,9 +234,9 @@ with col2:
             "¿Cuáles son los valores únicos de [columna]?",
             "Calcula la media de [columna_numérica]",
             "¿Qué cultivos se dan en el muncipio de pasca?"
-        ]
-        for example in examples2:
-            st.write(f"• {example}")
+       ]
+       for example in examples2:
+          st.write(f"• {example}")
     
 st.divider()
 
