@@ -66,7 +66,6 @@ with st.sidebar:
         """)
 
 
-
 # Verificar API key
 if not openai_api_key:
     st.warning("⚠️ Por favor ingresa tu API Key de OpenAI en la barra lateral.")
@@ -129,17 +128,6 @@ if st.session_state.get('agent') is None or st.session_state.agent_config_key !=
 if st.session_state.agent is not None:
     st.success("🎯 Agente IA inicializado correctamente")
     
-    # Información del dataset
-    #col1, col2, col3 = st.columns(3)
-    #with col1:
-    #    st.metric("📏 Filas", st.session_state.df.shape[0])
-    #with col2:
-    #    st.metric("📊 Columnas", st.session_state.df.shape[1])
-    #with col3:
-    #    st.metric("🤖 Modelo", model_name)
-    
-   # st.divider()
-    
     # Ejemplos de preguntas
     st.subheader("💡 Ejemplos de preguntas que puedes hacer:")
     
@@ -157,7 +145,7 @@ if st.session_state.agent is not None:
     
     with col2:
         examples2 = [
-            "¿¿Cuál es la correlación mayor entre las variables numéricas?",
+            "¿Cuál es la correlación mayor entre las variables numéricas?",
             "¿Cuáles son los valores únicos de [columna]?",
             "Calcula la media de [columna_numérica]",
             "¿Qué cultivos se dan en el muncipio de pasca?"
@@ -169,6 +157,10 @@ if st.session_state.agent is not None:
     
     # Interface para hacer preguntas
     st.subheader("❓ Haz tu pregunta sobre los datos")
+    
+    # Función callback para limpiar historial (evita el loop)
+    def limpiar_historial():
+        st.session_state.chat_history = []
     
     # Usar un formulario para evitar rerun automático
     with st.form(key="question_form", clear_on_submit=True):
@@ -186,10 +178,8 @@ if st.session_state.agent is not None:
         with col3:
             pass
     
-    # Botón de limpiar historial fuera del formulario
-    if st.button("🗑️ Limpiar historial"):
-        st.session_state.chat_history = []
-        st.rerun()
+    # Botón de limpiar historial usando callback (sin rerun manual)
+    st.button("🗑️ Limpiar historial", on_click=limpiar_historial)
     
     if ask_button and user_question:
         with st.spinner("🔄 El agente está analizando tus datos..."):
@@ -218,8 +208,6 @@ if st.session_state.agent is not None:
                 st.markdown("**Respuesta:**")
                 st.write(chat['answer'])
                 st.divider()
-    
-    
 
 else:
     st.error("❌ No se pudo inicializar el agente. Verifica tu API key.")
