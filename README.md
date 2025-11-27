@@ -106,7 +106,7 @@ Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaci
 
 ```
 Ejemplos de consultas:
-- "¿Qué significa un alto valor de Aluminio?"
+- "¿Cómo se interpreta un valor muy alto de acidez KCl o aluminio intercambiable en el suelo y qué acción recomienda aplica?"
 - "¿Qué hacer si tengo un pH de agua bajo?"
 - "¿Cómo interpretar la asimetría en los datos?"
 ```
