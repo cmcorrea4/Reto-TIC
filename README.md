@@ -247,7 +247,7 @@ En la página **📊 Análisis e IDC**:
 1. Selecciona las variables a analizar
 2. Elige el método de detección de outliers
 3. Haz clic en "Generar Análisis"
-4. Revisa el ICD, estadísticos y visualizaciones
+4. Revisa el ICD, estadísticos, algoritmos de clasificación IA "Clásica" y visualizaciones
 
 ### 3. Consultas con IA
 
@@ -255,14 +255,14 @@ En la página **🤖🔬 Asistente de datos**:
 
 1. Las credenciales se cargan automáticamente desde secrets
 2. Escribe tu pregunta en lenguaje natural
-3. El agente analizará los datos y responderá
+3. El agente analizará y responderá sobre los datos consultados, teniendo la posibilidad de operarlos
 
 ### 4. Consultas sobre recomendaciones
 
 En la página **🤖📚 Asistente de información**:
 
 1. Las credenciales se cargan automáticamente desde secrets
-2. Haz preguntas sobre interpretación de resultados o recomendaciones agronómicas
+2. Haz preguntas sobre interpretación de resultados o recomendaciones agronómicas, conocimiento que puede ser incremental y construida con expertos
 
 ---
 
