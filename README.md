@@ -9,6 +9,16 @@ Herramienta integral para el análisis de calidad de datos de suelos agrícolas,
 
 ---
 
+## 🌐 Demo en Vivo
+
+La aplicación está desplegada en **Streamlit Cloud**:
+
+🔗 **[Acceder a SueloGuIA](https://tu-app.streamlit.app)**
+
+> *Reemplaza el enlace con la URL de tu aplicación desplegada*
+
+---
+
 ## 📋 Descripción
 
 SueloGuIA es una aplicación web desarrollada con Streamlit que permite:
@@ -26,16 +36,19 @@ SueloGuIA es una aplicación web desarrollada con Streamlit que permite:
 ```
 sueloguia/
 │
-├── Inicio.py                    # Página principal - Carga de datos
+├── Inicio.py                 # Página principal - Carga de datos
 ├── utils.py                  # Utilidades: limpieza, normalización, tipos
 ├── calidad_datos.py          # Cálculo del Índice de Calidad de Datos (ICD)
 ├── visualizaciones.py        # Estadísticos descriptivos y gráficos
 ├── recomendaciones.pdf       # Documento base para RAG (recomendaciones agronómicas)
 │
 ├── pages/
-│   ├── 2_📊_Análisis e IDC.py  # Análisis estadístico y cálculo de ICD
-│   ├── 3_🤖🔬_Asistente de datos.py   # Agente conversacional con Pandas
-│   └── 4_🤖📚_Asistente de información.py       # Asistente RAG con documento de recomendaciones
+│   ├── 2_📊_Análisis e IDC.py              # Análisis estadístico y cálculo de ICD
+│   ├── 3_🤖🔬_Asistente de datos.py        # Agente conversacional con Pandas
+│   └── 4_🤖📚_Asistente de información.py  # Asistente RAG con documento de recomendaciones
+│
+├── .streamlit/
+│   └── secrets.toml          # Configuración de secrets (solo local)
 │
 ├── requirements.txt          # Dependencias del proyecto
 └── README.md                 # Este archivo
@@ -88,7 +101,7 @@ Tres métodos disponibles para la dimensión de Precisión:
 - Matriz de correlación con heatmap
 - Tabla de estadísticos descriptivos completa
 
-### 5. Agente IA para Consultas (`pages/🤖🔬_Asistente de datos.py`)
+### 5. Agente IA para Consultas (`pages/3_🤖🔬_Asistente de datos.py`)
 
 Utiliza LangChain + OpenAI GPT para responder preguntas en lenguaje natural:
 
@@ -100,7 +113,7 @@ Ejemplos de consultas:
 - "¿Qué cultivos se dan en el municipio de Pasca?"
 ```
 
-### 6. RAG con Recomendaciones (`pages/🤖📚_Asistente de información.py `)
+### 6. RAG con Recomendaciones (`pages/4_🤖📚_Asistente de información.py`)
 
 Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`:
 
@@ -113,7 +126,7 @@ Ejemplos de consultas:
 
 ---
 
-## 🛠️ Instalación
+## 🛠️ Instalación Local
 
 ### Prerrequisitos
 
@@ -141,10 +154,51 @@ Ejemplos de consultas:
    pip install -r requirements.txt
    ```
 
-4. **Ejecutar la aplicación**
+4. **Configurar secrets** (ver sección de configuración)
+
+5. **Ejecutar la aplicación**
    ```bash
-   streamlit run app.py
+   streamlit run Inicio.py
    ```
+
+---
+
+## ⚙️ Configuración
+
+### Configuración de API Key (Secrets)
+
+La aplicación utiliza `st.secrets` para manejar las credenciales de forma segura.
+
+#### Desarrollo Local
+
+Crea el archivo `.streamlit/secrets.toml` en la raíz del proyecto:
+
+```toml
+[settings]
+key = "sk-proj-tu-api-key-de-openai"
+```
+
+> ⚠️ **Importante**: Agrega `.streamlit/secrets.toml` a tu `.gitignore` para no exponer tu API Key.
+
+#### Streamlit Cloud
+
+1. Ve a tu aplicación en [share.streamlit.io](https://share.streamlit.io)
+2. Haz clic en **Settings** (⚙️) → **Secrets**
+3. Agrega la configuración:
+
+```toml
+[settings]
+key = "sk-proj-tu-api-key-de-openai"
+```
+
+4. Guarda los cambios y reinicia la aplicación
+
+### Configuración de Socrata
+
+Para conectar a datos.gov.co:
+- **Dominio**: `www.datos.gov.co`
+- **Dataset ID**: `ch4u-f3i5` (datos de suelos Agrosavia)
+- **App Token**: Opcional, pero recomendado para mayor límite de requests
 
 ---
 
@@ -190,7 +244,7 @@ Desde la página principal, puedes:
 
 ### 2. Analizar calidad de datos
 
-En la página **📊_Análisis e IDC.py**:
+En la página **📊 Análisis e IDC**:
 
 1. Selecciona las variables a analizar
 2. Elige el método de detección de outliers
@@ -199,17 +253,17 @@ En la página **📊_Análisis e IDC.py**:
 
 ### 3. Consultas con IA
 
-En la página **🤖🔬_Asistente de datos.py**:
+En la página **🤖🔬 Asistente de datos**:
 
-1. Ingresa tu API Key de OpenAI en la barra lateral
+1. Las credenciales se cargan automáticamente desde secrets
 2. Escribe tu pregunta en lenguaje natural
 3. El agente analizará los datos y responderá
 
 ### 4. Consultas sobre recomendaciones
 
-En la página **🤖📚_Asistente de información**:
+En la página **🤖📚 Asistente de información**:
 
-1. Ingresa tu API Key de OpenAI
+1. Las credenciales se cargan automáticamente desde secrets
 2. Haz preguntas sobre interpretación de resultados o recomendaciones agronómicas
 
 ---
@@ -237,25 +291,6 @@ La aplicación está optimizada para las siguientes variables de análisis de su
 | `manganeso_disponible_olsen` | Manganeso disponible - Olsen (ppm) |
 | `zinc_disponible_olsen` | Zinc disponible - Olsen (ppm) |
 | `boro_disponible` | Boro disponible (ppm) |
-
----
-
-## ⚙️ Configuración
-
-### Variables de entorno
-
-Puedes configurar la API Key de OpenAI como variable de entorno:
-
-```bash
-export OPENAI_API_KEY="tu-api-key-aqui"
-```
-
-### Configuración de Socrata
-
-Para conectar a datos.gov.co:
-- **Dominio**: `www.datos.gov.co`
-- **Dataset ID**: `ch4u-f3i5` (datos de suelos Agrosavia)
-- **App Token**: Opcional, pero recomendado para mayor límite de requests
 
 ---
 
