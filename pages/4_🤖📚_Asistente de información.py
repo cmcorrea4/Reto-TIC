@@ -1,5 +1,5 @@
 """
- Página de RAG con PDF - Generación Aumentada por Recuperación
+  Página de RAG con PDF - Generación Aumentada por Recuperación
 Usa el archivo recomendaciones.pdf de la raíz del proyecto
 Compatible con LangChain 0.2.x y OpenAI 1.x
 Incluye Speech-to-Text (Whisper) y Text-to-Speech (OpenAI TTS)
@@ -14,15 +14,15 @@ st.set_page_config(page_title="RAG PDF", page_icon="📄", layout="wide")
 st.title("📄 Asistente de información")
 st.markdown("Haz preguntas por texto o voz y te responderá con base en mi conocimiento.")
 
-# ============================================================================
+# ==========================
 # CONFIGURACIÓN
-# ============================================================================
+
 
 RUTA_PDF = "recomendaciones.pdf"
 
-# ============================================================================
+# ============================================================
 # CONFIGURACIÓN DE API KEY DESDE SECRETS
-# ============================================================================
+
 
 try:
     openai_api_key = st.secrets["settings"]["key"]
@@ -33,9 +33,7 @@ except:
 if ia_disponible:
     os.environ["OPENAI_API_KEY"] = openai_api_key
 
-# ============================================================================
-# CONFIGURACIÓN EN SIDEBAR
-# ============================================================================
+
 
 with st.sidebar:
     st.header("⚙️ Configuración RAG")
@@ -116,9 +114,9 @@ if not ia_disponible:
     st.stop()
 
 
-# ============================================================================
+# =====
 # IMPORTAR DEPENDENCIAS
-# ============================================================================
+# ============
 
 try:
     from pypdf import PdfReader
@@ -151,9 +149,9 @@ except ImportError:
 # Cliente OpenAI para STT y TTS
 client = OpenAI(api_key=openai_api_key)
 
-# ============================================================================
+# ==========================
 # FUNCIONES DE VOZ
-# ============================================================================
+# ================
 
 def speech_to_text(audio_bytes):
     """Convierte audio a texto usando Whisper de OpenAI."""
@@ -203,9 +201,9 @@ def display_audio_player(audio_bytes):
     st.markdown(audio_html, unsafe_allow_html=True)
 
 
-# ============================================================================
+
 # FUNCIONES RAG
-# ============================================================================
+# 
 
 @st.cache_data
 def extract_text_from_pdf(ruta):
@@ -279,9 +277,9 @@ Respuesta:"""
     return qa_chain
 
 
-# ============================================================================
+# =======================================
 # CARGAR Y PROCESAR PDF
-# ============================================================================
+# ===============
 
 text = extract_text_from_pdf(RUTA_PDF)
 
@@ -300,9 +298,9 @@ except Exception as e:
     st.info("Verifica que la API key sea válida y tenga créditos disponibles.")
     st.stop()
 
-# ============================================================================
+
 # INTERFAZ DE CONSULTA
-# ============================================================================
+
 
 if 'rag_chat_history' not in st.session_state:
     st.session_state.rag_chat_history = []
@@ -327,7 +325,7 @@ with col1:
     
 with col2:
     examples2 = [
-        "¿Qué indica un Coeficiente de Variación (CV) cercano a 0?",
+        "¿¿Cómo mejoro la materia orgánica de mi finca?",
         "¿Qué diferencia hay entre asimetría positiva y negativa?",
         "¿Cómo se interpreta un valor muy alto de acidez KCl?"
     ]
@@ -339,7 +337,7 @@ st.divider()
 def limpiar_historial_rag():
     st.session_state.rag_chat_history = []
 
-# ============================================================================
+# =================================================
 # ENTRADA: TEXTO O VOZ
 # ============================================================================
 
