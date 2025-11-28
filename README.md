@@ -18,7 +18,7 @@ SueloGuIA está diseñada para facilitar el uso de los datos de suelos al **pers
 |-------|--------|------------------|---------------------|
 | 🔬 **Experto** | Análisis Estadístico e ICD | Investigadores, técnicos de laboratorio | Estadísticos descriptivos, detección de outliers, índices de calidad, visualizaciones técnicas |
 | 👨‍💻 **Técnico** | Agente de Datos (Pandas) | Profesionales agropecuarios, extensionistas | Consultas en lenguaje natural sobre los datos, correlaciones, filtros por cultivo/región |
-| 🌾 **Campo** | Agente de Asistencia (RAG + Voz) | Agricultores, campesinos | Recomendaciones prácticas en lenguaje sencillo, interacción por voz, respuestas orientadas a la acción |
+| 👨‍🌾 **Campo** | Agente de Asistencia (RAG + Voz) | Agricultores, campesinos | Recomendaciones prácticas en lenguaje sencillo, interacción por voz, respuestas orientadas a la acción |
 
 Esta arquitectura multinivel permite que:
 - Los **investigadores de Agrosavia** realicen análisis profundos de calidad de datos antes de publicar o usar la información
@@ -114,7 +114,7 @@ sueloguia/
 ├── pages/
 │   ├── 2_📊_Análisis e IDC.py              # Análisis estadístico y cálculo de ICD
 │   ├── 3_👨‍💻_Asistente de datos.py        # Agente conversacional con Pandas
-│   └── 4_🌾_Asistente Campesino.py  # Asistente RAG con voz habilitada
+│   └── 4_👨‍🌾_Asistente Campesino.py  # Asistente RAG con voz habilitada
 │
 ├── .streamlit/
 │   └── secrets.toml          # Configuración de secrets (solo local)
@@ -181,7 +181,7 @@ Ejemplos de consultas:
 - "¿Qué cultivos se dan en el municipio de Pasca?"
 ```
 
-### 6. RAG con Recomendaciones y Voz (`🌾_Asistente Campesino.py`)
+### 6. RAG con Recomendaciones y Voz (`👨‍🌾_Asistente Campesino.py`)
 
 Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`, **con soporte completo de voz**:
 
@@ -338,7 +338,7 @@ En la página **👨‍💻_Asistente de datos.py **:
 
 ### 4. Consultas sobre recomendaciones (con voz) 🎤🔊
 
-En la página **🌾_Asistente Campesino.py**:
+En la página **👨‍🌾_Asistente Campesino.py**:
 
 1. Las credenciales se cargan automáticamente desde secrets
 2. **Escribir**: Escribe tu pregunta en el formulario
