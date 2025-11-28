@@ -22,7 +22,7 @@ SueloGuIA está diseñada para facilitar el uso de los datos de suelos al **pers
 
 Esta arquitectura multinivel permite que:
 - Los **investigadores de Agrosavia** realicen análisis profundos de calidad de datos antes de publicar o usar la información
-- Los **extensionistas** consulten rápidamente información específica sin necesidad de programar
+- Los **extensionistas** consulten rápidamente información específica sin necesidad de manipular tablas de datos o programar
 - Los **agricultores** reciban orientación clara y accionable sobre el manejo de sus suelos, sin barreras tecnológicas
 
 ---
