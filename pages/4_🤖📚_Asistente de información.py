@@ -1,5 +1,5 @@
 """
-Página de RAG con PDF - Generación Aumentada por Recuperación
+ Página de RAG con PDF - Generación Aumentada por Recuperación
 Usa el archivo recomendaciones.pdf de la raíz del proyecto
 Compatible con LangChain 0.2.x y OpenAI 1.x
 Incluye Speech-to-Text (Whisper) y Text-to-Speech (OpenAI TTS)
@@ -77,7 +77,7 @@ with st.sidebar:
             step=0.1
         )
         
-        st.caption("⚠️ TTS tiene costo: $0.015/1K caracteres")
+        #st.caption("⚠️ TTS tiene costo: $0.015/1K caracteres")
     
     st.divider()
     
@@ -359,7 +359,7 @@ with tab_texto:
             ask_button = st.form_submit_button("🚀 Preguntar", type="primary")
 
 with tab_voz:
-    st.caption("⚠️ Costo: $0.006 por minuto de audio")
+    #st.caption("⚠️ Costo: $0.006 por minuto de audio")
     
     if AUDIO_RECORDER_AVAILABLE:
         st.info("🎤 Clic en el micrófono para grabar")
