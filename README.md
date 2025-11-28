@@ -113,8 +113,8 @@ sueloguia/
 │
 ├── pages/
 │   ├── 2_📊_Análisis e IDC.py              # Análisis estadístico y cálculo de ICD
-│   ├── 3_🤖🔬_Asistente de datos.py        # Agente conversacional con Pandas
-│   └── 4_🤖📚_Asistente de información.py  # Asistente RAG con voz habilitada
+│   ├── 3_👨‍💻_Asistente de datos.py        # Agente conversacional con Pandas
+│   └── 4_🌾_Asistente Campesino.py  # Asistente RAG con voz habilitada
 │
 ├── .streamlit/
 │   └── secrets.toml          # Configuración de secrets (solo local)
@@ -170,7 +170,7 @@ Tres métodos disponibles para la dimensión de Precisión:
 - Matriz de correlación con heatmap
 - Tabla de estadísticos descriptivos completa
 
-### 5. Agente IA para Consultas (`pages/3_🤖🔬_Asistente de datos.py`)
+### 5. Agente IA para Consultas (`3_👨‍💻_Asistente de datos.py   `)
 
 Utiliza LangChain + OpenAI GPT para responder preguntas en lenguaje natural:
 
@@ -182,7 +182,7 @@ Ejemplos de consultas:
 - "¿Qué cultivos se dan en el municipio de Pasca?"
 ```
 
-### 6. RAG con Recomendaciones y Voz (`pages/4_🤖📚_Asistente de información.py`)
+### 6. RAG con Recomendaciones y Voz (`🌾_Asistente Campesino.py`)
 
 Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`, **con soporte completo de voz**:
 
