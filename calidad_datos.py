@@ -334,7 +334,15 @@ def calcular_precision_outliers(df: pd.DataFrame, variables_numericas: List[str]
 
 
 def calcular_variabilidad(df: pd.DataFrame, variables_numericas: List[str] = None) -> Dict:
-    """Calcula la variabilidad mediante el Coeficiente de Variación (CV)."""
+    """
+    Calcula la variabilidad mediante el Coeficiente de Variación (CV).
+    
+    Criterios de evaluación (alineados con la visualización):
+    - CV < 10%: Baja variabilidad (puede indicar datos homogéneos o problema de escala)
+    - CV 10-50%: Variabilidad moderada (ideal para la mayoría de variables)
+    - CV 50-100%: Alta variabilidad (revisar si es esperado para el tipo de dato)
+    - CV > 100%: Muy alta variabilidad (posibles outliers o problemas de datos)
+    """
     df_numeric = preparar_dataframe_numerico(df, variables_numericas)
     
     if df_numeric.empty:
@@ -345,6 +353,7 @@ def calcular_variabilidad(df: pd.DataFrame, variables_numericas: List[str] = Non
 
     cv_por_columna = {}
     columnas_variabilidad_extrema = {}
+    columnas_cv_adecuado = 0  # CV entre 10% y 100%
     cvs_validos = []
 
     for col in df_numeric.columns:
@@ -356,29 +365,72 @@ def calcular_variabilidad(df: pd.DataFrame, variables_numericas: List[str] = Non
         mean = data.mean()
         std = data.std()
 
-        # Manejo seguro cuando la media es muy pequeña
+        # Manejo seguro cuando la media es muy pequeña o cero
         if abs(mean) < 1e-9:
-            cv = np.inf
+            # Si la media es ~0, usar el rango como referencia alternativa
+            data_range = data.max() - data.min()
+            if data_range > 0:
+                cv = (std / data_range) * 100  # CV relativo al rango
+            else:
+                cv = 0  # Todos los valores son iguales
         else:
-            cv = (std / mean) * 100
+            cv = (std / abs(mean)) * 100  # Usar valor absoluto de la media
 
         cv_por_columna[col] = cv
         cvs_validos.append(abs(cv))
 
-        # Detectar variabilidad extrema
-        if cv == 0:
-            columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad nula'}
-        elif abs(cv) < 1 and data.nunique() > 1:
-            columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad extremadamente baja'}
-        elif abs(cv) > 200:
-            columnas_variabilidad_extrema[col] = {'cv': cv, 'problema': 'Variabilidad excesiva'}
+        # Clasificar variabilidad con umbrales más estrictos
+        if cv == 0 or (data.nunique() == 1):
+            # Variabilidad nula - todos los valores son iguales
+            columnas_variabilidad_extrema[col] = {
+                'cv': cv, 
+                'problema': 'Sin variabilidad (valores constantes)',
+                'categoria': 'nula'
+            }
+        elif abs(cv) < 5:
+            # Variabilidad muy baja - puede indicar problema
+            columnas_variabilidad_extrema[col] = {
+                'cv': cv, 
+                'problema': 'Variabilidad muy baja (<5%)',
+                'categoria': 'muy_baja'
+            }
+        elif abs(cv) < 10:
+            # Variabilidad baja - aceptable pero revisar
+            columnas_cv_adecuado += 0.5  # Cuenta parcialmente
+        elif abs(cv) <= 100:
+            # Variabilidad adecuada (10% - 100%)
+            columnas_cv_adecuado += 1
+        elif abs(cv) <= 150:
+            # Variabilidad alta - revisar
+            columnas_variabilidad_extrema[col] = {
+                'cv': cv, 
+                'problema': 'Variabilidad alta (100-150%)',
+                'categoria': 'alta'
+            }
+            columnas_cv_adecuado += 0.5  # Cuenta parcialmente
+        else:
+            # Variabilidad excesiva (>150%)
+            columnas_variabilidad_extrema[col] = {
+                'cv': cv, 
+                'problema': 'Variabilidad excesiva (>150%)',
+                'categoria': 'excesiva'
+            }
 
     n_columnas = len(cv_por_columna)
-    n_extremas = len(columnas_variabilidad_extrema)
 
     if n_columnas > 0:
-        pct_adecuadas = ((n_columnas - n_extremas) / n_columnas) * 100
+        # Calcular porcentaje de columnas con CV adecuado
+        pct_adecuadas = (columnas_cv_adecuado / n_columnas) * 100
+        
+        # Score basado en el porcentaje de columnas con variabilidad adecuada
+        # Máximo 15 puntos
         score = (pct_adecuadas / 100) * 15
+        
+        # Penalización adicional por columnas con problemas severos
+        n_severas = sum(1 for info in columnas_variabilidad_extrema.values() 
+                       if info.get('categoria') in ['nula', 'muy_baja', 'excesiva'])
+        penalizacion = min(5, n_severas * 1.5)  # Máximo 5 puntos de penalización
+        score = max(0, score - penalizacion)
     else:
         pct_adecuadas = 100
         score = 15
@@ -386,13 +438,12 @@ def calcular_variabilidad(df: pd.DataFrame, variables_numericas: List[str] = Non
     cv_promedio = np.mean(cvs_validos) if cvs_validos else 0
 
     return {
-        'score': score,
-        'cv_promedio': cv_promedio,
+        'score': round(score, 2),
+        'cv_promedio': round(cv_promedio, 2),
         'cv_por_columna': cv_por_columna,
         'columnas_variabilidad_extrema': columnas_variabilidad_extrema,
-        'pct_variabilidad_adecuada': pct_adecuadas
+        'pct_variabilidad_adecuada': round(pct_adecuadas, 2)
     }
-
 
 
 def calcular_integridad(df: pd.DataFrame, columnas_esperadas: List[str] = None) -> Dict:
@@ -491,11 +542,31 @@ def generar_recomendaciones(resultado_icd: Dict) -> List[str]:
             f"⚠️ **Outliers significativos ({n_out} detectados)**: Revisar valores atípicos."
         )
     
-    if len(detalles['variabilidad']['columnas_variabilidad_extrema']) > 0:
-        n_extremas = len(detalles['variabilidad']['columnas_variabilidad_extrema'])
-        recomendaciones.append(
-            f"⚠️ **{n_extremas} columnas con variabilidad extrema**: Revisar escalas."
-        )
+    # Recomendaciones mejoradas para variabilidad
+    variabilidad = detalles['variabilidad']
+    if variabilidad['columnas_variabilidad_extrema']:
+        problemas_por_tipo = {}
+        for col, info in variabilidad['columnas_variabilidad_extrema'].items():
+            categoria = info.get('categoria', 'otro')
+            if categoria not in problemas_por_tipo:
+                problemas_por_tipo[categoria] = []
+            problemas_por_tipo[categoria].append(col)
+        
+        if 'nula' in problemas_por_tipo or 'muy_baja' in problemas_por_tipo:
+            cols = problemas_por_tipo.get('nula', []) + problemas_por_tipo.get('muy_baja', [])
+            recomendaciones.append(
+                f"⚠️ **{len(cols)} columnas con variabilidad muy baja**: "
+                f"Revisar si los datos son correctos o si hay problemas de captura. "
+                f"Variables: {', '.join(cols[:5])}{'...' if len(cols) > 5 else ''}"
+            )
+        
+        if 'excesiva' in problemas_por_tipo:
+            cols = problemas_por_tipo['excesiva']
+            recomendaciones.append(
+                f"⚠️ **{len(cols)} columnas con variabilidad excesiva (CV>150%)**: "
+                f"Posibles outliers o diferentes unidades de medida. "
+                f"Variables: {', '.join(cols[:5])}{'...' if len(cols) > 5 else ''}"
+            )
     
     if detalles['consistencia']['valores_inconsistentes'] > 0:
         n_incons = detalles['consistencia']['valores_inconsistentes']
