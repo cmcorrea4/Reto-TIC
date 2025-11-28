@@ -11,7 +11,7 @@ import base64
 
 st.set_page_config(page_title="RAG PDF", page_icon="📄", layout="wide")
 
-st.title("📄 Asistente de información")
+st.title("🌾 Asistente Campesino")
 st.markdown("Haz preguntas por texto o voz y te responderá con base en mi conocimiento.")
 
 # ==========================
