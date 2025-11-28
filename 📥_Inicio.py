@@ -1,5 +1,5 @@
 """
-Página Principal - Agente datos suelos Agrosavia
+Página Principal - Carga de los datos
 """
 import streamlit as st
 import pandas as pd
@@ -14,14 +14,14 @@ from utils import asignar_tipos_datos, DataCleaner
 
 # Configuración de la página
 st.set_page_config(
-    page_title="Agente datos suelos Agrosavia",
-    page_icon="📊",
+    page_title="Suelos Agrosavia",
+    page_icon="📥",
     layout="wide"
 )
 
-# ============================================================================
+# ========
 # INICIALIZACIÓN DE SESSION STATE
-# ============================================================================
+# =====================================
 
 if 'df' not in st.session_state:
     st.session_state.df = None
@@ -52,9 +52,9 @@ def load_data_from_socrata(domain: str, dataset_id: str, limit: int, app_token: 
         return None, str(e)
 
 
-# ============================================================================
+# =============================================
 # INTERFAZ PRINCIPAL
-# ============================================================================
+# ===========================================================================
 
 st.title("📊 SueloGuIA")
 st.markdown("**Herramienta para cálculo del índice de calidad de datos (ICD) y análisis con asistentes conversacionales**")
@@ -91,9 +91,9 @@ with st.sidebar:
             st.session_state.chat_history = []
             st.rerun()
 
-# ============================================================================
+
 # CARGAR DATOS
-# ============================================================================
+
 
 st.header("📁 Cargar Datos")
 
@@ -194,21 +194,6 @@ with subtab2:
             
         except Exception as e:
             st.error(f"❌ Error al cargar el archivo: {str(e)}")
-
-# Comparación de datos
-if st.session_state.df is not None and st.session_state.df_original is not None:
-    with st.expander("🔍 Comparar datos originales vs procesados"):
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.subheader("📋 Datos Originales")
-            st.write(f"Shape: {st.session_state.df_original.shape}")
-            st.dataframe(st.session_state.df_original.head(5), use_container_width=True)
-        
-        with col2:
-            st.subheader("✨ Datos Procesados")
-            st.write(f"Shape: {st.session_state.df.shape}")
-            st.dataframe(st.session_state.df.head(5), use_container_width=True)
 
 # Información inicial
 if st.session_state.df is None:
