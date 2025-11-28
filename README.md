@@ -25,7 +25,7 @@ Las respuestas del asistente pueden ser **reproducidas en audio**, facilitando l
 ### 💡 ¿Por qué es importante?
 
 - **Inclusión digital**: Democratiza el acceso a información técnica agrícola
-- **Analfabetismo funcional**: Según el DANE, aproximadamente el 5.2% de la población rural colombiana tiene dificultades de lectoescritura
+- **Analfabetismo funcional**: Según la GEIH 2023 del DANE, la tasa de analfabetismo en la zona rural de Colombia es de aproximadamente 10,4 %
 - **Comodidad**: Los agricultores pueden consultar mientras trabajan en campo
 - **Idioma natural**: Permite hacer preguntas como se habla cotidianamente
 
