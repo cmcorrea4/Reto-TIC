@@ -169,7 +169,7 @@ Tres métodos disponibles para la dimensión de Precisión:
 - Matriz de correlación con heatmap
 - Tabla de estadísticos descriptivos completa
 
-### 5. Agente IA para Consultas (`3_👨‍💻_Asistente de datos.py   `)
+### 5. Agente IA para Consultas (`👨‍💻_Asistente de datos.py   `)
 
 Utiliza LangChain + OpenAI GPT para responder preguntas en lenguaje natural:
 
