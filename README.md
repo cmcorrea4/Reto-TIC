@@ -10,6 +10,23 @@ Herramienta integral para el análisis de calidad de datos de suelos agrícolas,
 
 ---
 
+## 👥 Usuarios y Niveles de Uso
+
+SueloGuIA está diseñada para facilitar el uso de los datos de suelos al **personal de Agrosavia** y a la **comunidad agrícola**, apoyando el análisis y la toma de decisiones a partir de la información recolectada. La plataforma ofrece **tres niveles de interacción** adaptados a diferentes perfiles de usuario:
+
+| Nivel | Módulo | Usuario objetivo | Tipo de información |
+|-------|--------|------------------|---------------------|
+| 🔬 **Experto** | Análisis Estadístico e ICD | Investigadores, técnicos de laboratorio | Estadísticos descriptivos, detección de outliers, índices de calidad, visualizaciones técnicas |
+| 🤖 **Técnico** | Agente de Datos (Pandas) | Profesionales agropecuarios, extensionistas | Consultas en lenguaje natural sobre los datos, correlaciones, filtros por cultivo/región |
+| 🌾 **Campo** | Agente de Asistencia (RAG + Voz) | Agricultores, campesinos | Recomendaciones prácticas en lenguaje sencillo, interacción por voz, respuestas orientadas a la acción |
+
+Esta arquitectura multinivel permite que:
+- Los **investigadores de Agrosavia** realicen análisis profundos de calidad de datos antes de publicar o usar la información
+- Los **extensionistas** consulten rápidamente información específica sin necesidad de programar
+- Los **agricultores** reciban orientación clara y accionable sobre el manejo de sus suelos, sin barreras tecnológicas
+
+---
+
 ## 🎯 Accesibilidad para el Campo Colombiano
 
 > *"La Ciencia Más útil es aquella cuyo fruto es el más comunicable. (L. Davinci)"*
