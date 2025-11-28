@@ -4,8 +4,30 @@
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT--4-green.svg)](https://openai.com)
 [![LangChain](https://img.shields.io/badge/LangChain-0.2+-yellow.svg)](https://langchain.com)
+[![Accesibilidad](https://img.shields.io/badge/Accesibilidad-Voz-orange.svg)](#-accesibilidad-por-voz)
 
-Herramienta integral para el análisis de calidad de datos de suelos agrícolas, cálculo del **Índice de Calidad de Datos (ICD)** y consultas mediante asistentes conversacionales con IA.
+Herramienta integral para el análisis de calidad de datos de suelos agrícolas, cálculo del **Índice de Calidad de Datos (ICD)** y consultas mediante asistentes conversacionales con IA. **Diseñada con funciones de voz para facilitar el acceso a población rural y campesina.**
+
+---
+
+## 🎯 Accesibilidad para el Campo Colombiano
+
+> *"La tecnología debe estar al servicio de todos, especialmente de quienes alimentan a Colombia"*
+
+SueloGuIA incorpora **funcionalidades de voz** pensadas especialmente para la **población campesina** que puede tener dificultades con la lectura o escritura:
+
+### 🎤 Habla tu pregunta
+No necesitas escribir. Simplemente **graba tu voz** y el sistema transcribirá automáticamente tu consulta.
+
+### 🔊 Escucha las respuestas
+Las respuestas del asistente pueden ser **reproducidas en audio**, facilitando la comprensión sin necesidad de leer textos extensos.
+
+### 💡 ¿Por qué es importante?
+
+- **Inclusión digital**: Democratiza el acceso a información técnica agrícola
+- **Analfabetismo funcional**: Según el DANE, aproximadamente el 5.2% de la población rural colombiana tiene dificultades de lectoescritura
+- **Comodidad**: Los agricultores pueden consultar mientras trabajan en campo
+- **Idioma natural**: Permite hacer preguntas como se habla cotidianamente
 
 ---
 
@@ -26,6 +48,43 @@ SueloGuIA es una aplicación web desarrollada con Streamlit que permite:
 - **Visualizar estadísticas** descriptivas y detectar outliers con múltiples métodos
 - **Consultar datos** mediante lenguaje natural con un agente IA (GPT + Pandas)
 - **Obtener recomendaciones** agronómicas mediante RAG (Retrieval-Augmented Generation)
+- **Interactuar por voz** 🎤 para hacer preguntas y 🔊 escuchar respuestas
+
+---
+
+## 🗣️ Funcionalidades de Voz
+
+### Speech-to-Text (Voz a Texto) 🎤
+
+Convierte tu voz en texto usando **OpenAI Whisper**:
+
+| Característica | Descripción |
+|----------------|-------------|
+| **Grabación directa** | Graba desde el micrófono del dispositivo |
+| **Subir audio** | Soporta archivos WAV, MP3, M4A, OGG |
+| **Idioma** | Optimizado para español colombiano |
+| **Costo** | $0.006 USD por minuto de audio |
+
+**Ejemplo de uso:**
+1. Haz clic en el ícono del micrófono 🎤
+2. Habla tu pregunta: *"¿Qué significa que el pH del suelo esté bajo?"*
+3. El sistema transcribe y procesa automáticamente
+
+### Text-to-Speech (Texto a Voz) 🔊
+
+Escucha las respuestas en voz natural usando **OpenAI TTS**:
+
+| Característica | Descripción |
+|----------------|-------------|
+| **6 voces disponibles** | alloy, echo, fable, onyx, nova, shimmer |
+| **Velocidad ajustable** | De 0.5x a 2.0x |
+| **Idioma** | Pronunciación clara en español |
+| **Costo** | $0.015 USD por cada 1,000 caracteres |
+
+**Voces recomendadas para español:**
+- **Nova**: Voz femenina clara y amigable ⭐ Recomendada
+- **Onyx**: Voz masculina profunda
+- **Alloy**: Voz neutral y versátil
 
 ---
 
@@ -43,7 +102,7 @@ sueloguia/
 ├── pages/
 │   ├── 2_📊_Análisis e IDC.py              # Análisis estadístico y cálculo de ICD
 │   ├── 3_🤖🔬_Asistente de datos.py        # Agente conversacional con Pandas
-│   └── 4_🤖📚_Asistente de información.py  # Asistente RAG con documento de recomendaciones
+│   └── 4_🤖📚_Asistente de información.py  # Asistente RAG con voz habilitada
 │
 ├── .streamlit/
 │   └── secrets.toml          # Configuración de secrets (solo local)
@@ -111,16 +170,22 @@ Ejemplos de consultas:
 - "¿Qué cultivos se dan en el municipio de Pasca?"
 ```
 
-### 6. RAG con Recomendaciones (`pages/4_🤖📚_Asistente de información.py`)
+### 6. RAG con Recomendaciones y Voz (`pages/4_🤖📚_Asistente de información.py`)
 
-Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`:
+Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`, **ahora con soporte completo de voz**:
 
 ```
-Ejemplos de consultas:
-- "¿Cómo se interpreta un valor muy alto de acidez KCl o aluminio intercambiable en el suelo y qué acción recomienda aplica?"
-- "¿Qué hacer si tengo un pH de agua bajo?"
-- "¿Cómo interpretar la asimetría en los datos?"
+Ejemplos de consultas (escritas o habladas):
+- 🎤 "¿Qué hago si mi tierra tiene mucho aluminio?"
+- 🎤 "¿Por qué el pH de mi suelo está bajito?"
+- 🎤 "¿Cómo mejoro la materia orgánica de mi finca?"
 ```
+
+**Características de voz:**
+- ⌨️ **Tab Escribir**: Entrada tradicional por texto
+- 🎤 **Tab Grabar voz**: Grabación directa desde micrófono
+- 🔊 **Respuesta en audio**: Activa desde la barra lateral
+- 📁 **Subir audio**: Alternativa para archivos grabados
 
 ---
 
@@ -131,6 +196,7 @@ Ejemplos de consultas:
 - Python 3.9 o superior
 - pip (gestor de paquetes de Python)
 - API Key de OpenAI (para funcionalidades de IA)
+- Micrófono (opcional, para funciones de voz)
 
 ### Pasos de instalación
 
@@ -227,7 +293,23 @@ openai>=1.0.0
 # RAG / Procesamiento de PDF
 pypdf>=3.0.0
 faiss-cpu>=1.7.0
+
+# Funcionalidades de Voz
+audio-recorder-streamlit==0.0.10
 ```
+
+---
+
+## 💰 Costos de las Funcionalidades de Voz
+
+Las funcionalidades de voz utilizan la API de OpenAI y tienen los siguientes costos:
+
+| Servicio | Modelo | Costo | Ejemplo |
+|----------|--------|-------|---------|
+| **Speech-to-Text** | Whisper | $0.006/minuto | 10 min de audio = $0.06 |
+| **Text-to-Speech** | TTS-1 | $0.015/1K caracteres | Respuesta de 500 chars = $0.0075 |
+
+**Nota**: El TTS está **deshabilitado por defecto** para evitar costos innecesarios. El usuario puede activarlo desde la barra lateral cuando lo necesite.
 
 ---
 
@@ -255,14 +337,19 @@ En la página **🤖🔬 Asistente de datos**:
 
 1. Las credenciales se cargan automáticamente desde secrets
 2. Escribe tu pregunta en lenguaje natural
-3. El agente analizará y responderá sobre los datos consultados, teniendo la posibilidad de operarlos
+3. El agente analizará y responderá sobre los datos consultados
 
-### 4. Consultas sobre recomendaciones
+### 4. Consultas sobre recomendaciones (con voz) 🎤🔊
 
 En la página **🤖📚 Asistente de información**:
 
 1. Las credenciales se cargan automáticamente desde secrets
-2. Haz preguntas sobre interpretación de resultados o recomendaciones agronómicas, conocimiento que puede ser incremental y construida con expertos
+2. **Opción A - Escribir**: Escribe tu pregunta en el formulario
+3. **Opción B - Hablar**: 
+   - Ve a la pestaña "🎤 Grabar voz"
+   - Haz clic en el micrófono y habla tu pregunta
+   - Presiona "Transcribir y preguntar"
+4. **Escuchar respuesta**: Activa "🔊 Habilitar respuesta por voz" en la barra lateral
 
 ---
 
@@ -289,6 +376,17 @@ La aplicación está optimizada para las siguientes variables de análisis de su
 | `manganeso_disponible_olsen` | Manganeso disponible - Olsen (ppm) |
 | `zinc_disponible_olsen` | Zinc disponible - Olsen (ppm) |
 | `boro_disponible` | Boro disponible (ppm) |
+
+---
+
+## 🌾 Impacto Social
+
+SueloGuIA busca contribuir a:
+
+- **Democratización del conocimiento agrícola**: Información técnica accesible para todos
+- **Inclusión digital rural**: Tecnología adaptada a las necesidades del campo
+- **Mejora de la productividad**: Decisiones informadas basadas en datos de calidad
+- **Sostenibilidad agrícola**: Mejor manejo de suelos basado en evidencia
 
 ---
 
@@ -322,10 +420,16 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 - [Datos Abiertos Colombia](https://datos.gov.co/) - Plataforma de datos abiertos
 - [Streamlit](https://streamlit.io/) - Framework de aplicaciones web
 - [LangChain](https://langchain.com/) - Framework para aplicaciones con LLMs
-- [OpenAI](https://openai.com/) - Modelos de lenguaje GPT
+- [OpenAI](https://openai.com/) - Modelos de lenguaje GPT, Whisper y TTS
 
 ---
 
 ## 📞 Soporte
 
 Si tienes preguntas o problemas, por favor abre un issue en el repositorio.
+
+---
+
+<p align="center">
+  <i>Hecho con ❤️ para el campo colombiano</i>
+</p>
