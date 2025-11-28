@@ -105,7 +105,7 @@ La versión actual utiliza la API de OpenAI, que tiene costos por uso:
 ```
 sueloguia/
 │
-├── 📥_Inicio.py                 # Página principal - Carga de datos
+├── 📥_Inicio.py              # Página principal - Carga de datos
 ├── utils.py                  # Utilidades: limpieza, normalización, tipos
 ├── calidad_datos.py          # Cálculo del Índice de Calidad de Datos (ICD)
 ├── visualizaciones.py        # Estadísticos descriptivos y gráficos
@@ -113,14 +113,14 @@ sueloguia/
 │
 ├── pages/
 │   ├── 2_📊_Análisis e IDC.py              # Análisis estadístico y cálculo de ICD
-│   ├── 3_👨‍💻_Asistente de datos.py        # Agente conversacional con Pandas
-│   └── 4_👨‍🌾_Asistente Campesino.py  # Asistente RAG con voz habilitada
+│   ├── 3_👨‍💻_Asistente de datos.py          # Agente conversacional con Pandas
+│   └── 4_👨‍🌾_Asistente Campesino.py         # Asistente RAG con voz habilitada
 │
 ├── .streamlit/
-│   └── secrets.toml          # Configuración de secrets (solo local)
+│   └── secrets.toml                         # Configuración de secrets (solo local)
 │
-├── requirements.txt          # Dependencias del proyecto
-└── README.md                 # Este archivo
+├── requirements.txt                         # Dependencias del proyecto
+└── README.md                                # Este archivo
 ```
 
 ---
