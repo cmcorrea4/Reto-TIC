@@ -129,9 +129,8 @@ sueloguia/
 
 ### 1. Carga de Datos (`📥_Inicio.py`)
 
-- **Archivos locales**: Soporte para CSV y Excel (.xlsx, .xls)
 - **API Socrata**: Conexión directa a datos.gov.co y otros portales de datos abiertos
-- **Limpieza automática**: Eliminación de filas/columnas vacías, duplicados y conversión de tipos
+- **Archivos locales**: Soporte para CSV y Excel (.xlsx, .xls)
 - **Normalización**: Estandarización de nombres de columnas (tildes, espacios, mayúsculas)
 
 ### 2. Índice de Calidad de Datos - ICD (`📊_Análisis e IDC.py`)
