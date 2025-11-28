@@ -52,39 +52,17 @@ SueloGuIA es una aplicación web desarrollada con Streamlit que permite:
 
 ---
 
-## 🗣️ Funcionalidades de Voz
+## 🎙️ Multimodalidad
 
-### Speech-to-Text (Voz a Texto) 🎤
+SueloGuIA integra capacidades de **voz** para una experiencia más accesible e inclusiva:
 
-Convierte tu voz en texto usando **OpenAI Whisper**:
+| Funcionalidad | Tecnología | Descripción |
+|---------------|------------|-------------|
+| **Voz a Texto** | OpenAI Whisper | Transcribe preguntas habladas al sistema |
+| **Texto a Voz** | OpenAI TTS | Reproduce las respuestas en audio con voces naturales |
+| **Grabación** | audio-recorder-streamlit | Captura audio directamente desde el navegador |
 
-| Característica | Descripción |
-|----------------|-------------|
-| **Grabación directa** | Graba desde el micrófono del dispositivo |
-| **Subir audio** | Soporta archivos WAV, MP3, M4A, OGG |
-| **Idioma** | Optimizado para español colombiano |
-| **Costo** | $0.006 USD por minuto de audio |
-
-**Ejemplo de uso:**
-1. Haz clic en el ícono del micrófono 🎤
-2. Habla tu pregunta: *"¿Qué significa que el pH del suelo esté bajo?"*
-3. El sistema transcribe y procesa automáticamente
-
-### Text-to-Speech (Texto a Voz) 🔊
-
-Escucha las respuestas en voz natural usando **OpenAI TTS**:
-
-| Característica | Descripción |
-|----------------|-------------|
-| **6 voces disponibles** | alloy, echo, fable, onyx, nova, shimmer |
-| **Velocidad ajustable** | De 0.5x a 2.0x |
-| **Idioma** | Pronunciación clara en español |
-| **Costo** | $0.015 USD por cada 1,000 caracteres |
-
-**Voces recomendadas para español:**
-- **Nova**: Voz femenina clara y amigable ⭐ Recomendada
-- **Onyx**: Voz masculina profunda
-- **Alloy**: Voz neutral y versátil
+**Formatos de audio soportados:** WAV, MP3, M4A, OGG
 
 ---
 
@@ -172,7 +150,7 @@ Ejemplos de consultas:
 
 ### 6. RAG con Recomendaciones y Voz (`pages/4_🤖📚_Asistente de información.py`)
 
-Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`, **ahora con soporte completo de voz**:
+Sistema de Retrieval-Augmented Generation que consulta el documento `recomendaciones.pdf`, **con soporte completo de voz**:
 
 ```
 Ejemplos de consultas (escritas o habladas):
@@ -181,11 +159,10 @@ Ejemplos de consultas (escritas o habladas):
 - 🎤 "¿Cómo mejoro la materia orgánica de mi finca?"
 ```
 
-**Características de voz:**
-- ⌨️ **Tab Escribir**: Entrada tradicional por texto
-- 🎤 **Tab Grabar voz**: Grabación directa desde micrófono
+**Características:**
+- ⌨️ **Escribir**: Entrada tradicional por texto
+- 🎤 **Grabar voz**: Grabación directa desde micrófono
 - 🔊 **Respuesta en audio**: Activa desde la barra lateral
-- 📁 **Subir audio**: Alternativa para archivos grabados
 
 ---
 
@@ -294,22 +271,9 @@ openai>=1.0.0
 pypdf>=3.0.0
 faiss-cpu>=1.7.0
 
-# Funcionalidades de Voz
+# Multimodalidad (Voz)
 audio-recorder-streamlit==0.0.10
 ```
-
----
-
-## 💰 Costos de las Funcionalidades de Voz
-
-Las funcionalidades de voz utilizan la API de OpenAI y tienen los siguientes costos:
-
-| Servicio | Modelo | Costo | Ejemplo |
-|----------|--------|-------|---------|
-| **Speech-to-Text** | Whisper | $0.006/minuto | 10 min de audio = $0.06 |
-| **Text-to-Speech** | TTS-1 | $0.015/1K caracteres | Respuesta de 500 chars = $0.0075 |
-
-**Nota**: El TTS está **deshabilitado por defecto** para evitar costos innecesarios. El usuario puede activarlo desde la barra lateral cuando lo necesite.
 
 ---
 
@@ -344,12 +308,9 @@ En la página **🤖🔬 Asistente de datos**:
 En la página **🤖📚 Asistente de información**:
 
 1. Las credenciales se cargan automáticamente desde secrets
-2. **Opción A - Escribir**: Escribe tu pregunta en el formulario
-3. **Opción B - Hablar**: 
-   - Ve a la pestaña "🎤 Grabar voz"
-   - Haz clic en el micrófono y habla tu pregunta
-   - Presiona "Transcribir y preguntar"
-4. **Escuchar respuesta**: Activa "🔊 Habilitar respuesta por voz" en la barra lateral
+2. **Escribir**: Escribe tu pregunta en el formulario
+3. **Hablar**: Graba tu voz y presiona "Transcribir y preguntar"
+4. **Escuchar**: Activa "🔊 Habilitar respuesta por voz" en la barra lateral
 
 ---
 
