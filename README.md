@@ -12,7 +12,7 @@ Herramienta integral para el análisis de calidad de datos de suelos agrícolas,
 
 ## 🎯 Accesibilidad para el Campo Colombiano
 
-> *"La tecnología debe estar al servicio de todos, especialmente de quienes alimentan a Colombia"*
+> *"La Ciencia Más útil es aquella cuyo fruto es el más comunicable. (L. Davinci)"*
 
 SueloGuIA incorpora **funcionalidades de voz** pensadas especialmente para la **población campesina** que puede tener dificultades con la lectura o escritura:
 
