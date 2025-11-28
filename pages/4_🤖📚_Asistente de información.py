@@ -325,7 +325,7 @@ with col1:
     
 with col2:
     examples2 = [
-        "¿¿Cómo mejoro la materia orgánica de mi finca?",
+        "¿Cómo mejoro la materia orgánica de mi finca?",
         "¿Qué diferencia hay entre asimetría positiva y negativa?",
         "¿Cómo se interpreta un valor muy alto de acidez KCl?"
     ]
