@@ -17,7 +17,7 @@ SueloGuIA está diseñada para facilitar el uso de los datos de suelos al **pers
 | Nivel | Módulo | Usuario objetivo | Tipo de información |
 |-------|--------|------------------|---------------------|
 | 🔬 **Experto** | Análisis Estadístico e ICD | Investigadores, técnicos de laboratorio | Estadísticos descriptivos, detección de outliers, índices de calidad, visualizaciones técnicas |
-| 🤖 **Técnico** | Agente de Datos (Pandas) | Profesionales agropecuarios, extensionistas | Consultas en lenguaje natural sobre los datos, correlaciones, filtros por cultivo/región |
+| 👨‍💻 **Técnico** | Agente de Datos (Pandas) | Profesionales agropecuarios, extensionistas | Consultas en lenguaje natural sobre los datos, correlaciones, filtros por cultivo/región |
 | 🌾 **Campo** | Agente de Asistencia (RAG + Voz) | Agricultores, campesinos | Recomendaciones prácticas en lenguaje sencillo, interacción por voz, respuestas orientadas a la acción |
 
 Esta arquitectura multinivel permite que:
