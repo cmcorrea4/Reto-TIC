@@ -2,14 +2,17 @@
 Página de RAG con PDF - Generación Aumentada por Recuperación
 Usa el archivo recomendaciones.pdf de la raíz del proyecto
 Compatible con LangChain 0.2.x y OpenAI 1.x
+Incluye Speech-to-Text (Whisper) y Text-to-Speech (OpenAI TTS)
 """
 import streamlit as st
 import os
+import tempfile
+import base64
 
 st.set_page_config(page_title="RAG PDF", page_icon="📄", layout="wide")
 
 st.title("📄 Asistente de información")
-st.markdown("Haz preguntas y te responderá con base en mi conocimiento.")
+st.markdown("Haz preguntas por texto o voz y te responderá con base en mi conocimiento.")
 
 # ============================================================================
 # CONFIGURACIÓN
@@ -21,7 +24,6 @@ RUTA_PDF = "recomendaciones.pdf"
 # CONFIGURACIÓN DE API KEY DESDE SECRETS
 # ============================================================================
 
-# Verificar si existe la API key en secrets
 try:
     openai_api_key = st.secrets["settings"]["key"]
     ia_disponible = True
@@ -54,6 +56,31 @@ with st.sidebar:
     
     st.divider()
     
+    # Configuración de voz
+    st.subheader("🎙️ Configuración de Voz")
+    
+    enable_tts = st.checkbox("🔊 Habilitar respuesta por voz", value=False)
+    
+    if enable_tts:
+        tts_voice = st.selectbox(
+            "Voz:",
+            ["alloy", "echo", "fable", "onyx", "nova", "shimmer"],
+            index=4,  # nova por defecto
+            help="Selecciona la voz para las respuestas"
+        )
+        
+        tts_speed = st.slider(
+            "Velocidad:",
+            min_value=0.5,
+            max_value=2.0,
+            value=1.0,
+            step=0.1
+        )
+        
+        st.caption("⚠️ TTS tiene costo: $0.015/1K caracteres")
+    
+    st.divider()
+    
     # Configuración avanzada
     with st.expander("🔧 Configuración avanzada"):
         chunk_size = st.slider("Tamaño de chunks:", 200, 1500, 500, 50)
@@ -62,15 +89,18 @@ with st.sidebar:
     
     st.divider()
 
-    with st.expander("ℹ️ ¿Cómo funciona esta consulta?"):
-       st.markdown("""
-          Esta página usa **RAG (Retrieval-Augmented Generation)**:
-    
-          1. **Indexación**: El documento se divide en fragmentos y se crean embeddings vectoriales
-          2. **Búsqueda**: Tu pregunta se convierte en un vector y se buscan los fragmentos (vectores) más similares
-          3. **Generación**: GPT genera una respuesta basada en los fragmentos encontrados
-    
-          """)
+    with st.expander("ℹ️ ¿Cómo funciona?"):
+        st.markdown("""
+        **RAG (Retrieval-Augmented Generation):**
+        
+        1. **Indexación**: El documento se divide en fragmentos con embeddings vectoriales
+        2. **Búsqueda**: Tu pregunta se busca entre los fragmentos más similares
+        3. **Generación**: GPT genera una respuesta basada en los fragmentos
+        
+        **Funciones de voz:**
+        - 🎤 **Speech-to-Text**: Whisper ($0.006/min)
+        - 🔊 **Text-to-Speech**: OpenAI TTS ($0.015/1K chars)
+        """)
 
 
 # Verificar que existe el PDF
@@ -97,6 +127,7 @@ try:
     from langchain_community.vectorstores import FAISS
     from langchain.chains import RetrievalQA
     from langchain.prompts import PromptTemplate
+    from openai import OpenAI
 except ImportError as e:
     st.error(f"❌ Error al importar dependencias: {str(e)}")
     st.info("""
@@ -106,11 +137,74 @@ except ImportError as e:
     - langchain-openai
     - langchain-community
     - faiss-cpu
+    - openai
     """)
     st.stop()
 
+# Intentar importar audio_recorder_streamlit
+try:
+    from audio_recorder_streamlit import audio_recorder
+    AUDIO_RECORDER_AVAILABLE = True
+except ImportError:
+    AUDIO_RECORDER_AVAILABLE = False
+
+# Cliente OpenAI para STT y TTS
+client = OpenAI(api_key=openai_api_key)
+
 # ============================================================================
-# FUNCIONES
+# FUNCIONES DE VOZ
+# ============================================================================
+
+def speech_to_text(audio_bytes):
+    """Convierte audio a texto usando Whisper de OpenAI."""
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".wav") as tmp_file:
+            tmp_file.write(audio_bytes)
+            tmp_file_path = tmp_file.name
+        
+        with open(tmp_file_path, "rb") as audio_file:
+            transcript = client.audio.transcriptions.create(
+                model="whisper-1",
+                file=audio_file,
+                language="es"
+            )
+        
+        os.unlink(tmp_file_path)
+        return transcript.text
+    except Exception as e:
+        st.error(f"❌ Error en transcripción: {str(e)}")
+        return None
+
+
+def text_to_speech(text, voice="nova", speed=1.0):
+    """Convierte texto a audio usando OpenAI TTS."""
+    try:
+        response = client.audio.speech.create(
+            model="tts-1",
+            voice=voice,
+            input=text,
+            speed=speed
+        )
+        return response.content
+    except Exception as e:
+        st.error(f"❌ Error en síntesis de voz: {str(e)}")
+        return None
+
+
+def display_audio_player(audio_bytes):
+    """Muestra un reproductor de audio."""
+    b64 = base64.b64encode(audio_bytes).decode()
+    audio_html = f"""
+        <audio controls>
+            <source src="data:audio/mp3;base64,{b64}" type="audio/mp3">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
+    """
+    st.markdown(audio_html, unsafe_allow_html=True)
+
+
+# ============================================================================
+# FUNCIONES RAG
 # ============================================================================
 
 @st.cache_data
@@ -143,7 +237,7 @@ def create_chunks(text, chunk_size=500, chunk_overlap=50):
 
 @st.cache_resource
 def create_vector_store(_chunks, api_key, chunk_config):
-    """Crea el vector store con FAISS. El _chunks evita hashing del objeto."""
+    """Crea el vector store con FAISS."""
     embeddings = OpenAIEmbeddings(openai_api_key=api_key)
     vector_store = FAISS.from_texts(list(_chunks), embeddings)
     return vector_store
@@ -189,21 +283,18 @@ Respuesta:"""
 # CARGAR Y PROCESAR PDF
 # ============================================================================
 
-# Extraer texto
 text = extract_text_from_pdf(RUTA_PDF)
 
 if not text:
     st.error("❌ No se pudo extraer texto del PDF")
     st.stop()
 
-# Crear chunks
 chunks = create_chunks(text, chunk_size=chunk_size, chunk_overlap=chunk_overlap)
 
-# Crear vector store
 try:
     chunk_config = f"{chunk_size}_{chunk_overlap}"
     vector_store = create_vector_store(tuple(chunks), openai_api_key, chunk_config)
-    st.success(f"Asistente de información configurado ✅ Documento listo: {len(chunks)} secciones indexadas")
+    st.success(f"✅ Asistente listo: {len(chunks)} secciones indexadas | 🎤 Voz disponible")
 except Exception as e:
     st.error(f"❌ Error creando embeddings: {str(e)}")
     st.info("Verifica que la API key sea válida y tenga créditos disponibles.")
@@ -213,58 +304,136 @@ except Exception as e:
 # INTERFAZ DE CONSULTA
 # ============================================================================
 
-# Inicializar historial
 if 'rag_chat_history' not in st.session_state:
     st.session_state.rag_chat_history = []
+
+if 'voice_question' not in st.session_state:
+    st.session_state.voice_question = ""
 
 st.divider()
 
 # Ejemplos de preguntas
-st.subheader("💡 Ejemplos de preguntas que puedes hacer:")
+st.subheader("💡 Ejemplos de preguntas:")
 col1, col2 = st.columns(2)
     
 with col1:
     examples1 = [
-            "Que significa un alto valor de Aluminio?",
-            "¿Que hacer si tengo un ph de agua Bajo?",
-            "¿Qué significa la métrica de Completitud dentro del Índice de Calidad de Datos y qué recomendación se dá cuando está baja?"
+        "¿Qué significa un alto valor de Aluminio?",
+        "¿Qué hacer si tengo un pH de agua bajo?",
+        "¿Qué significa la métrica de Completitud en el Índice de Calidad de Datos?"
     ]
     for example in examples1:
         st.write(f"• {example}")
     
 with col2:
     examples2 = [
-            "¿Qué indica un Coeficiente de Variación (CV) cercano a 0 o mayor a 200% ?",
-            "Qué diferencia hay entre asimetría positiva y asimetría negativa?",
-            "¿Cómo se interpreta un valor muy alto de acidez KCl o aluminio intercambiable en el suelo y qué acción recomienda aplica?"
+        "¿Qué indica un Coeficiente de Variación (CV) cercano a 0?",
+        "¿Qué diferencia hay entre asimetría positiva y negativa?",
+        "¿Cómo se interpreta un valor muy alto de acidez KCl?"
     ]
     for example in examples2:
         st.write(f"• {example}")
     
 st.divider()
 
-# Función callback para limpiar historial (evita el loop)
 def limpiar_historial_rag():
     st.session_state.rag_chat_history = []
 
-# Formulario de pregunta
-st.subheader("🔍 Haz tu consulta")
-with st.form(key="rag_question_form", clear_on_submit=True):
-    user_question = st.text_area(
-        "Escribe tu pregunta sobre el documento:",
-        placeholder="Ej: ¿Cuáles son las principales recomendaciones?",
-        height=100
-    )
-    
-    col1, col2, col3 = st.columns([1, 1, 3])
-    with col1:
-        ask_button = st.form_submit_button("🚀 Preguntar", type="primary")
+# ============================================================================
+# ENTRADA: TEXTO O VOZ
+# ============================================================================
 
-# Botón limpiar historial usando callback (sin rerun manual)
+st.subheader("🔍 Haz tu consulta")
+
+tab_texto, tab_voz = st.tabs(["⌨️ Escribir", "🎤 Grabar voz"])
+
+with tab_texto:
+    with st.form(key="rag_question_form", clear_on_submit=True):
+        user_question = st.text_area(
+            "Escribe tu pregunta:",
+            placeholder="Ej: ¿Cuáles son las principales recomendaciones?",
+            height=100
+        )
+        col1, col2, col3 = st.columns([1, 1, 3])
+        with col1:
+            ask_button = st.form_submit_button("🚀 Preguntar", type="primary")
+
+with tab_voz:
+    st.caption("⚠️ Costo: $0.006 por minuto de audio")
+    
+    if AUDIO_RECORDER_AVAILABLE:
+        st.info("🎤 Clic en el micrófono para grabar")
+        
+        audio_bytes = audio_recorder(
+            text="",
+            recording_color="#e74c3c",
+            neutral_color="#3498db",
+            icon_name="microphone",
+            icon_size="2x",
+            pause_threshold=2.0,
+            sample_rate=16000
+        )
+        
+        if audio_bytes:
+            st.audio(audio_bytes, format="audio/wav")
+            
+            if st.button("📝 Transcribir y preguntar", type="primary"):
+                with st.spinner("🔄 Transcribiendo..."):
+                    transcribed_text = speech_to_text(audio_bytes)
+                    if transcribed_text:
+                        st.success(f"📝 *{transcribed_text}*")
+                        st.session_state.voice_question = transcribed_text
+    else:
+        st.warning("Instala: `pip install audio-recorder-streamlit`")
+        
+        st.markdown("**Alternativa: Subir audio**")
+        uploaded_audio = st.file_uploader(
+            "Archivo de audio (WAV, MP3, M4A):",
+            type=["wav", "mp3", "m4a", "ogg", "webm"]
+        )
+        
+        if uploaded_audio:
+            st.audio(uploaded_audio)
+            
+            if st.button("📝 Transcribir y preguntar", type="primary"):
+                with st.spinner("🔄 Transcribiendo..."):
+                    audio_bytes = uploaded_audio.read()
+                    suffix = f".{uploaded_audio.name.split('.')[-1]}"
+                    
+                    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp_file:
+                        tmp_file.write(audio_bytes)
+                        tmp_file_path = tmp_file.name
+                    
+                    try:
+                        with open(tmp_file_path, "rb") as audio_file:
+                            transcript = client.audio.transcriptions.create(
+                                model="whisper-1",
+                                file=audio_file,
+                                language="es"
+                            )
+                        os.unlink(tmp_file_path)
+                        
+                        if transcript.text:
+                            st.success(f"📝 *{transcript.text}*")
+                            st.session_state.voice_question = transcript.text
+                    except Exception as e:
+                        st.error(f"❌ Error: {str(e)}")
+
 st.button("🗑️ Limpiar historial", on_click=limpiar_historial_rag)
 
-# Procesar pregunta
+# ============================================================================
+# PROCESAR PREGUNTA
+# ============================================================================
+
+question_to_process = None
+
 if ask_button and user_question.strip():
+    question_to_process = user_question.strip()
+elif st.session_state.voice_question:
+    question_to_process = st.session_state.voice_question
+    st.session_state.voice_question = ""
+
+if question_to_process:
     with st.spinner("🔍 Buscando en el documento..."):
         try:
             qa_chain = get_qa_chain(
@@ -274,27 +443,45 @@ if ask_button and user_question.strip():
                 k=k_results
             )
             
-            result = qa_chain.invoke({"query": user_question})
+            result = qa_chain.invoke({"query": question_to_process})
+            answer = result["result"]
             
-            st.session_state.rag_chat_history.append({
-                "question": user_question,
-                "answer": result["result"],
-                "sources": [doc.page_content[:300] + "..." for doc in result.get("source_documents", [])]
-            })
+            chat_entry = {
+                "question": question_to_process,
+                "answer": answer,
+                "sources": [doc.page_content[:300] + "..." for doc in result.get("source_documents", [])],
+                "audio": None
+            }
+            
+            # Generar audio si TTS está habilitado
+            if enable_tts:
+                with st.spinner("🔊 Generando audio..."):
+                    audio_response = text_to_speech(answer, voice=tts_voice, speed=tts_speed)
+                    if audio_response:
+                        chat_entry["audio"] = audio_response
+            
+            st.session_state.rag_chat_history.append(chat_entry)
+            
+            st.markdown("### 💬 Respuesta:")
+            st.write(answer)
+            
+            if chat_entry["audio"]:
+                st.markdown("**🔊 Escuchar:**")
+                display_audio_player(chat_entry["audio"])
             
         except Exception as e:
-            st.error(f"❌ Error al procesar la pregunta: {str(e)}")
+            st.error(f"❌ Error: {str(e)}")
             import traceback
-            with st.expander("🔧 Detalles del error"):
+            with st.expander("🔧 Detalles"):
                 st.code(traceback.format_exc())
 
 # ============================================================================
-### HISTORIAL DE CONSULTAS
+# HISTORIAL
 # ============================================================================
 
 if st.session_state.rag_chat_history:
     st.divider()
-    st.subheader("💬 Historial de consultas")
+    st.subheader("💬 Historial")
     
     for i, chat in enumerate(reversed(st.session_state.rag_chat_history)):
         question_preview = chat['question'][:60] + "..." if len(chat['question']) > 60 else chat['question']
@@ -305,10 +492,10 @@ if st.session_state.rag_chat_history:
             
             st.markdown("**Respuesta:**")
             st.write(chat['answer'])
-# ============================================================================
-### INFORMACIÓN ADICIONAL
-# ============================================================================
-
+            
+            if chat.get('audio'):
+                st.markdown("**🔊 Audio:**")
+                display_audio_player(chat['audio'])
 
 # ============================================================================
 ### INFORMACIÓN ADICIONAL
