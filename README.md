@@ -33,7 +33,7 @@ Esta arquitectura multinivel permite que:
 
 SueloGuIA incorpora **funcionalidades de voz** pensadas especialmente para la **población campesina** que puede tener dificultades con la lectura o escritura:
 
-### 🎤 Habla tu pregunta
+### 🎤 Haz preguntas con tu voz
 No necesitas escribir. Simplemente **graba tu voz** y el sistema transcribirá automáticamente tu consulta.
 
 ### 🔊 Escucha las respuestas
