@@ -64,6 +64,23 @@ SueloGuIA integra capacidades de **voz** para una experiencia más accesible e i
 
 **Formatos de audio soportados:** WAV, MP3, M4A, OGG
 
+### 💰 Costos y Alternativa Local
+
+La versión actual utiliza la API de OpenAI, que tiene costos por uso:
+
+| Servicio | Costo aproximado |
+|----------|------------------|
+| GPT-4 (chat/RAG) | ~$0.01-0.03 por consulta |
+| Whisper (voz a texto) | $0.006 por minuto de audio |
+| TTS (texto a voz) | $0.015 por cada 1,000 caracteres |
+
+> 💡 **Alternativa sin costo**: Este sistema puede implementarse completamente en local usando herramientas open source:
+> - **[Ollama](https://ollama.ai/)** - Modelos de lenguaje locales (Llama, Mistral, etc.)
+> - **[Whisper](https://github.com/openai/whisper)** - Transcripción de voz local
+> - **[Piper](https://github.com/rhasspy/piper)** - Síntesis de voz local en español
+>
+> Esta configuración elimina la dependencia de APIs externas y los costos asociados, ideal para despliegues rurales con conectividad limitada.
+
 ---
 
 ## 🏗️ Estructura del Proyecto
