@@ -105,7 +105,7 @@ La versión actual utiliza la API de OpenAI, que tiene costos por uso:
 ```
 sueloguia/
 │
-├── Inicio.py                 # Página principal - Carga de datos
+├── 📥_Inicio.py                 # Página principal - Carga de datos
 ├── utils.py                  # Utilidades: limpieza, normalización, tipos
 ├── calidad_datos.py          # Cálculo del Índice de Calidad de Datos (ICD)
 ├── visualizaciones.py        # Estadísticos descriptivos y gráficos
@@ -127,7 +127,7 @@ sueloguia/
 
 ## 🎯 Funcionalidades
 
-### 1. Carga de Datos (`Inicio.py`)
+### 1. Carga de Datos (`📥_Inicio.py`)
 
 - **Archivos locales**: Soporte para CSV y Excel (.xlsx, .xls)
 - **API Socrata**: Conexión directa a datos.gov.co y otros portales de datos abiertos
