@@ -330,7 +330,7 @@ En la página **📊 Análisis e IDC**:
 
 ### 3. Consultas con IA
 
-En la página **🤖🔬 Asistente de datos**:
+En la página **👨‍💻_Asistente de datos.py **:
 
 1. Las credenciales se cargan automáticamente desde secrets
 2. Escribe tu pregunta en lenguaje natural
@@ -338,7 +338,7 @@ En la página **🤖🔬 Asistente de datos**:
 
 ### 4. Consultas sobre recomendaciones (con voz) 🎤🔊
 
-En la página **🤖📚 Asistente de información**:
+En la página **🌾_Asistente Campesino.py**:
 
 1. Las credenciales se cargan automáticamente desde secrets
 2. **Escribir**: Escribe tu pregunta en el formulario
@@ -411,7 +411,7 @@ Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más det
 ## 🙏 Agradecimientos
 
 - [Agrosavia](https://www.agrosavia.co/) - Datos de análisis de suelos
-- [Datos Abiertos Colombia](https://datos.gov.co/) - Plataforma de datos abiertos
+- [Datos Abiertos Colombia](https://www.datos.gov.co/) - Plataforma de datos abiertos
 - [Streamlit](https://streamlit.io/) - Framework de aplicaciones web
 - [LangChain](https://langchain.com/) - Framework para aplicaciones con LLMs
 - [OpenAI](https://openai.com/) - Modelos de lenguaje GPT, Whisper y TTS
@@ -425,5 +425,5 @@ Si tienes preguntas o problemas, por favor abre un issue en el repositorio.
 ---
 
 <p align="center">
-  <i>Hecho con ❤️ para el campo colombiano</i>
+  <i>Hecho por SUME con ❤️ para el campo colombiano</i>
 </p>
