@@ -317,8 +317,8 @@ audio-recorder-streamlit==0.0.10
 
 Desde la página principal, puedes:
 
-- **Subir un archivo** CSV o Excel con datos de suelos
 - **Conectar a API Socrata** (ej: datos.gov.co, dataset `ch4u-f3i5`)
+- **Subir un archivo** CSV o Excel con datos de suelos
 
 ### 2. Analizar calidad de datos
 
@@ -327,7 +327,7 @@ En la página **📊 Análisis e IDC**:
 1. Selecciona las variables a analizar
 2. Elige el método de detección de outliers
 3. Haz clic en "Generar Análisis"
-4. Revisa el ICD, estadísticos, algoritmos de clasificación IA "Clásica" y visualizaciones
+4. Revisa el ICD, estadísticos, algoritmos de Machine learning para identificación de oultliers y visualizaciones
 
 ### 3. Consultas con IA
 
