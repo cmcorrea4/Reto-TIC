@@ -97,9 +97,56 @@ with st.sidebar:
 
 st.header("📁 Cargar Datos")
 
-subtab1, subtab2 = st.tabs(["📁 Archivo CSV/Excel", "🌐 API Socrata"])
+subtab1, subtab2 = st.tabs(["🌐 API Socrata", "📁 Archivo CSV/Excel"])
 
 with subtab1:
+    st.markdown("### 🌐 Configuración de Socrata")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        domain = st.text_input("🌍 Dominio:", value="www.datos.gov.co")
+    
+    with col2:
+        dataset_id = st.text_input("🆔 Dataset ID:", value="ch4u-f3i5")
+    
+    col3, col4 = st.columns(2)
+    
+    with col3:
+        limit = st.number_input("📊 Límite de registros:", min_value=100, max_value=50000, value=2000, step=500)
+    
+    with col4:
+        app_token = st.text_input("🔑 App Token (opcional):", type="password")
+    
+    if st.button("🔄 Cargar desde API", use_container_width=True, type="primary"):
+        if domain and dataset_id:
+            with st.spinner("📥 Cargando datos desde API..."):
+                df_raw, error = load_data_from_socrata(domain, dataset_id, limit, app_token if app_token else None)
+                
+                if df_raw is not None:
+                    df_raw = asignar_tipos_datos(df_raw)
+                    st.session_state.df_original = df_raw.copy()
+                    st.session_state.df = df_raw.copy()
+                    st.session_state.data_source = f"API: {domain}/{dataset_id}"
+                    
+                    st.success(f"✅ Datos cargados exitosamente desde API")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.metric("📏 Filas", st.session_state.df.shape[0])
+                    with col2:
+                        st.metric("📊 Columnas", st.session_state.df.shape[1])
+                    with col3:
+                        st.metric("💾 Tamaño", f"{st.session_state.df.memory_usage(deep=True).sum() / 1024:.1f} KB")
+                    
+                    with st.expander("👀 Vista previa de datos", expanded=True):
+                        st.dataframe(st.session_state.df.head(10), use_container_width=True)
+                else:
+                    st.error(f"❌ Error al cargar datos: {error}")
+        else:
+            st.warning("⚠️ Por favor completa los campos requeridos")
+
+with subtab2:
     uploaded_file = st.file_uploader(
         "Selecciona un archivo CSV o Excel:",
         type=['csv', 'xlsx', 'xls'],
@@ -148,53 +195,6 @@ with subtab1:
         except Exception as e:
             st.error(f"❌ Error al cargar el archivo: {str(e)}")
 
-with subtab2:
-    st.markdown("### 🌐 Configuración de Socrata")
-    
-    col1, col2 = st.columns(2)
-    
-    with col1:
-        domain = st.text_input("🌍 Dominio:", value="www.datos.gov.co")
-    
-    with col2:
-        dataset_id = st.text_input("🆔 Dataset ID:", value="ch4u-f3i5")
-    
-    col3, col4 = st.columns(2)
-    
-    with col3:
-        limit = st.number_input("📊 Límite de registros:", min_value=100, max_value=50000, value=2000, step=500)
-    
-    with col4:
-        app_token = st.text_input("🔑 App Token (opcional):", type="password")
-    
-    if st.button("🔄 Cargar desde API", use_container_width=True, type="primary"):
-        if domain and dataset_id:
-            with st.spinner("📥 Cargando datos desde API..."):
-                df_raw, error = load_data_from_socrata(domain, dataset_id, limit, app_token if app_token else None)
-                
-                if df_raw is not None:
-                    df_raw = asignar_tipos_datos(df_raw)
-                    st.session_state.df_original = df_raw.copy()
-                    st.session_state.df = df_raw.copy()
-                    st.session_state.data_source = f"API: {domain}/{dataset_id}"
-                    
-                    st.success(f"✅ Datos cargados exitosamente desde API")
-                    
-                    col1, col2, col3 = st.columns(3)
-                    with col1:
-                        st.metric("📏 Filas", st.session_state.df.shape[0])
-                    with col2:
-                        st.metric("📊 Columnas", st.session_state.df.shape[1])
-                    with col3:
-                        st.metric("💾 Tamaño", f"{st.session_state.df.memory_usage(deep=True).sum() / 1024:.1f} KB")
-                    
-                    with st.expander("👀 Vista previa de datos", expanded=True):
-                        st.dataframe(st.session_state.df.head(10), use_container_width=True)
-                else:
-                    st.error(f"❌ Error al cargar datos: {error}")
-        else:
-            st.warning("⚠️ Por favor completa los campos requeridos")
-
 # Comparación de datos
 if st.session_state.df is not None and st.session_state.df_original is not None:
     with st.expander("🔍 Comparar datos originales vs procesados"):
@@ -216,13 +216,13 @@ if st.session_state.df is None:
     st.info("""
     ### 🚀 Cómo usar:
     
-    **Opción 1: Archivo CSV/Excel**
-    1. 📁 Sube un archivo CSV o Excel
-    2. 🧹 Opcional: Aplica limpieza automática
-    
-    **Opción 2: API Socrata**
+    **Opción 1: API Socrata**
     1. 🌍 Ingresa dominio y Dataset ID
     2. 🔄 Carga desde API
+    
+    **Opción 2: Archivo CSV/Excel**
+    1. 📁 Sube un archivo CSV o Excel
+    2. 🧹 Opcional: Aplica limpieza automática
     
     **Luego navega a las otras páginas:**
     - 📊 **Estadísticos**: Consulta estadísticos y calidad de datos
